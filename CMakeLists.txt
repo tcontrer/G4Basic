@@ -26,3 +26,4 @@ include(${Geant4_USE_FILE})
 ## Recurse through sub-directories
 add_subdirectory(src)
 add_subdirectory(app)
+add_subdirectory(cfg)
