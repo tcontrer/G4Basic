@@ -11,6 +11,8 @@
 
 #include <G4VUserPrimaryGeneratorAction.hh>
 
+class G4ParticleDefinition;
+
 
 class PrimaryGeneration: public G4VUserPrimaryGeneratorAction
 {

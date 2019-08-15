@@ -9,21 +9,21 @@
 #include "RunAction.h"
 
 
-B1RunAction::B1RunAction(): G4UserRunAction()
+RunAction::RunAction(): G4UserRunAction()
 {
 }
 
 
-B1RunAction::~B1RunAction()
+RunAction::~RunAction()
 {
 }
 
 
-void B1RunAction::BeginOfRunAction(const G4Run*)
+void RunAction::BeginOfRunAction(const G4Run*)
 {
 }
 
 
-void B1RunAction::EndOfRunAction(const G4Run* run)
+void RunAction::EndOfRunAction(const G4Run*)
 {
 }

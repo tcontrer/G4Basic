@@ -6,7 +6,7 @@
 //   * Creation date: 15 Aug 2019
 // -----------------------------------------------------------------------------
 
-#include "EventAction.hh"
+#include "EventAction.h"
 
 
 EventAction::EventAction(): G4UserEventAction()
@@ -24,6 +24,6 @@ void EventAction::BeginOfEventAction(const G4Event*)
 }
 
 
-void B1EventAction::EndOfEventAction(const G4Event*)
+void EventAction::EndOfEventAction(const G4Event*)
 {
 }

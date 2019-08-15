@@ -8,13 +8,14 @@
 
 #include "DetectorConstruction.h"
 #include "PrimaryGeneration.h"
+#include "SteppingAction.h"
 
 #include <G4RunManager.hh>
 #include <G4UImanager.hh>
 #include <G4VisExecutive.hh>
 #include <G4UIExecutive.hh>
-#include "QBBC.hh"
-#include "Randomize.hh"
+#include <FTFP_BERT_HP.hh>
+#include <G4EmStandardPhysics_option4.hh>
 
 
 int main(int argc, char** argv)
@@ -26,40 +27,37 @@ int main(int argc, char** argv)
     ui = new G4UIExecutive(argc, argv);
   }
 
-  // Choose the Random engine
-  G4Random::setTheEngine(new CLHEP::RanecuEngine);
-
   // Construct the run manager and set the initialization classes
   G4RunManager* runmgr = new G4RunManager();
-  runmgr->SetUserInitialization(new DetectorConstruction());
-  G4VModularPhysicsList* physicsList = new QBBC;
-  physicsList->SetVerboseLevel(1);
-  runmgr->SetUserInitialization(physicsList);
 
-  // User action initialization
-  runmgr->SetUserAction(new B1PrimaryGeneratorAction());
+  G4VModularPhysicsList* physics_list = new FTFP_BERT_HP();
+  physics_list->ReplacePhysics(new G4EmStandardPhysics_option4());
+  runmgr->SetUserInitialization(physics_list);
+
+  runmgr->SetUserInitialization(new DetectorConstruction());
+
+  runmgr->SetUserAction(new PrimaryGeneration());
+
+  runmgr->SetUserAction(new SteppingAction());
 
   // Initialize visualization
-  //
-  G4VisManager* visManager = new G4VisExecutive;
-  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // G4VisManager* visManager = new G4VisExecutive("Quiet");
-  visManager->Initialize();
+  G4VisManager* vismgr = new G4VisExecutive();
+  vismgr->Initialize();
 
   // Get the pointer to the User Interface manager
-  G4UImanager* UImanager = G4UImanager::GetUIpointer();
+  G4UImanager* uimgr = G4UImanager::GetUIpointer();
 
   // Process macro or start UI session
   //
-  if ( ! ui ) {
+  if (!ui) {
     // batch mode
     G4String command = "/control/execute ";
     G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
+    uimgr->ApplyCommand(command+fileName);
   }
   else {
     // interactive mode
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
+    uimgr->ApplyCommand("/control/execute init_vis.mac");
     ui->SessionStart();
     delete ui;
   }
@@ -67,8 +65,8 @@ int main(int argc, char** argv)
   // Job termination
   // Free the store: user actions, physics_list and detector_description are
   // owned and deleted by the run manager, so they should not be deleted
-  // in the main() program !
+  // in the main() program.
 
-  delete visManager;
+  delete vismgr;
   delete runmgr;
 }
