@@ -2,7 +2,7 @@
 ##  G4Basic | CMakeLists.txt
 ##
 ##  Main CMake build script.
-##   * Author: Justo Martin-Albo
+##   * Author: Justo Martin-Albo, Taylor Contreras
 ##   * Creation date: 14 Aug 2019
 ## ---------------------------------------------------------
 
@@ -23,7 +23,14 @@ endif()
 ## Setup Geant4 include directories and compile definitions.
 include(${Geant4_USE_FILE})
 
+## Find ROOT headers and libraries
+find_package(ROOT REQUIRED)
+
+## Setup Root
+#include(${ROOT_USE_FILE})
+
 ## Recurse through sub-directories
 add_subdirectory(src)
 add_subdirectory(app)
 add_subdirectory(cfg)
+

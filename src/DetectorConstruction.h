@@ -2,7 +2,7 @@
 //  G4Basic | DetectorConstruction.h
 //
 //  Class for the definition of the detector geometry and materials.
-//   * Author: Justo Martin-Albo
+//   * Author: Justo Martin-Albo, Taylor Contreras
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 
@@ -10,6 +10,7 @@
 #define DETECTOR_CONSTRUCTION_H
 
 #include <G4VUserDetectorConstruction.hh>
+#include <G4MaterialPropertiesTable.hh>
 
 class G4Material;
 
@@ -22,6 +23,8 @@ public:
   virtual G4VPhysicalVolume* Construct();
 private:
   G4Material* DefineNeon() const;
+  G4Material* DefineXenon() const;
+  G4MaterialPropertiesTable* PTFE();
 };
 
 #endif

@@ -2,7 +2,7 @@
 //  G4Basic | PrimaryGeneration.cpp
 //
 //  Class for the definition of the primary generation action.
-//   * Author: Justo Martin-Albo
+//   * Author: Justo Martin-Albo, Taylor Contreras
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
 
   G4PrimaryParticle* particle = new G4PrimaryParticle(pdef);
   particle->SetMomentumDirection(G4ThreeVector(0.,0.,1.));
-  particle->SetKineticEnergy(100.*keV);
+  particle->SetKineticEnergy(100.*MeV); //keV);
 
   G4PrimaryVertex* vertex = new G4PrimaryVertex(G4ThreeVector(), 0.);
   vertex->SetPrimary(particle);
