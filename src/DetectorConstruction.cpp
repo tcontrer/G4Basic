@@ -70,7 +70,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4double barrel_inner_diam = xenon_diam;
   G4double barrel_thickness = 5.0*cm;
   G4double barrel_length = xenon_length;
-  G4Material* barrel_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_POLYETHELENE");
+  G4Material* barrel_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_POLYETHYLENE");
   
   // OPTICAL SURFACE PROPERTIES
   G4OpticalSurface* refl_surface = new G4OpticalSurface("REFL_SURFACE");
@@ -93,7 +93,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4double tracking_diam = barrel_inner_diam + barrel_thickness*2.;
   G4double tracking_length = 12.*cm;
   G4ThreeVector tracking_pos = G4ThreeVector(0., 0., xenon_length/2. + tracking_length/2.);
-  G4Material* tracking_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_CU");
+  G4Material* tracking_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
   
   G4Tubs* tracking_solid_vol = 
     new G4Tubs(tracking_name, 0., tracking_diam/2., tracking_length/2., 0., 360.*deg);
@@ -109,7 +109,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4double energy_diam = barrel_inner_diam + barrel_thickness*2.;
   G4double energy_length = 12.*cm;
   G4ThreeVector energy_pos = G4ThreeVector(0., 0., -(xenon_length/2. + tracking_length/2.));
-  G4Material* energy_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_CU");
+  G4Material* energy_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
 
   G4Tubs* energy_solid_vol =
     new G4Tubs(energy_name, 0., energy_diam/2., energy_length/2., 0., 360.*deg);
