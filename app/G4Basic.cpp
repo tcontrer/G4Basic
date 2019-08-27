@@ -16,7 +16,10 @@
 #include <G4UIExecutive.hh>
 #include <FTFP_BERT_HP.hh>
 #include <G4EmStandardPhysics_option4.hh>
+#include <G4OpticalPhysics.hh>
+#include <G4RadioactiveDecayPhysics.hh>
 
+#include "TFile.h"
 
 int main(int argc, char** argv)
 {
@@ -27,11 +30,17 @@ int main(int argc, char** argv)
     ui = new G4UIExecutive(argc, argv);
   }
 
+  // make output file
+  TFile* MyFile = new TFile("MyFile.root", "RECREATE");
+
   // Construct the run manager and set the initialization classes
   G4RunManager* runmgr = new G4RunManager();
 
-  G4VModularPhysicsList* physics_list = new FTFP_BERT_HP();
-  physics_list->ReplacePhysics(new G4EmStandardPhysics_option4());
+  G4VModularPhysicsList* physics_list = new G4VModularPhysicsList();  //FTFP_BERT_HP();
+
+  physics_list->RegisterPhysics(new G4OpticalPhysics());
+  physics_list->RegisterPhysics(new G4EmStandardPhysics_option4());
+  physics_list->RegisterPhysics(new G4RadioactiveDecayPhysics());
   runmgr->SetUserInitialization(physics_list);
 
   runmgr->SetUserInitialization(new DetectorConstruction());

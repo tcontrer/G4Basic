@@ -160,18 +160,15 @@ G4Material* DetectorConstruction::DefineNeon() const
 G4Material* DetectorConstruction::DefineXenon() const
 {
   G4String material_name = "GXe";
-  G4Material* material = G4Material::GetMaterial("material_name", false);
+  G4double density = 88.56 * kg/m3;
+  G4double pressure = 15.0 * bar;
+  G4double temperature = 300. * kelvin;
 
-  if (!material) {
-    G4double density = 88.56 * kg/m3;
-    G4double pressure = 15.0 * bar;
-    G4double temperature = 300. * kelvin;
-    material = new G4Material(material_name, density, 1,
-			      kStateGas, temperature, pressure);
-    G4Element* Xe = G4NistManager::Instance()->FindOrBuildElement("Xe");
-    material->AddElement(Xe,1);
-  }
-
+  G4Material* material = new G4Material(material_name, density, 1,
+			    kStateGas, temperature, pressure);
+  G4Element* Xe = G4NistManager::Instance()->FindOrBuildElement("Xe");
+  material->AddElement(Xe,1);
+  
   return material;
 }
 

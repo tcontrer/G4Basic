@@ -13,3 +13,5 @@ SET(SRC   DetectorConstruction.cpp
           SteppingAction.cpp)
 
 add_library(${CMAKE_PROJECT_NAME} OBJECT ${SRC})
+
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${ROOT_INCLUDE_DIRS})

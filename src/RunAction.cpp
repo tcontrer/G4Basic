@@ -7,7 +7,10 @@
 // -----------------------------------------------------------------------------
 
 #include "RunAction.h"
-#include "TFile.h"
+//#include "TFile.h"
+#include <string.h>
+#include <iostream>
+using namespace std;
 
 RunAction::RunAction(): G4UserRunAction()
 {
@@ -21,6 +24,9 @@ RunAction::~RunAction()
 
 void RunAction::BeginOfRunAction(const G4Run*)
 {
+
+  //TFile* MyFile = new TFile("G4Basic.root", "RECREATE");
+  //cout << "\n\n\n------------------- RunAction ------------------------\n\n\n";
 }
 
 
