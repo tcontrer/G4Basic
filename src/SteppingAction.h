@@ -2,22 +2,35 @@
 //  G4Basic | SteppingAction.H
 //
 //  Definition of detector geometry and materials.
-//   * Author: Justo Martin-Albo
+//   * Author: Justo Martin-Albo, Taylor Contreras
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 
 #ifndef STEPPING_ACTION_H
 #define STEPPING_ACTION_H
 
-#include <G4UserSteppingAction.hh>
+#include "EventAction.h"
 
+#include "TFile.h"
+#include "TH1F.h"
+
+#include <G4UserSteppingAction.hh>
+#include <G4LogicalVolume.hh>
 
 class SteppingAction: public G4UserSteppingAction
 {
   public:
-    SteppingAction();
+    SteppingAction(EventAction* eventAction);
     virtual ~SteppingAction();
     virtual void UserSteppingAction(const G4Step*);
+
+ private:    
+    EventAction* fEventAction;
+    G4LogicalVolume* fEnergyPlane;
+    G4LogicalVolume* fTrackingPlane;
+    std::map<int, float> fTrackMap;
+    TFile* fMyFile;
+    TH1F* fhedep;
 };
 
 #endif

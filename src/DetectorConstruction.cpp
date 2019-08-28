@@ -19,7 +19,11 @@
 #include <G4OpticalSurface.hh>
 #include <G4LogicalSkinSurface.hh>
 
-DetectorConstruction::DetectorConstruction(): G4VUserDetectorConstruction()
+DetectorConstruction::DetectorConstruction()
+  : G4VUserDetectorConstruction(),
+    fEnergyPlane(0),
+    fTrackingPlane(0),
+    fpressure(15.*bar)
 {
 }
 
@@ -88,7 +92,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 		barrel_logic_vol, barrel_name, world_logic_vol, false, 0, true);
   
   // TRACKING PLANE //////////////////////////////////////////////
-  
+  // FIXME: make optical surface to count photons absorbed
+
   G4String tracking_name = "TRACKING_PLANE";
   G4double tracking_diam = barrel_inner_diam + barrel_thickness*2.;
   G4double tracking_length = 12.*cm;
@@ -135,6 +140,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 
   ///////////////////////////////////////////////////////////
+
+  fEnergyPlane = energy_logic_vol;
+  fTrackingPlane = tracking_logic_vol;
+
   return world_phys_vol;
 }
 
@@ -146,10 +155,10 @@ G4Material* DetectorConstruction::DefineNeon() const
 
   if (!material) {
     G4double density = 16.0 * kg/m3;
-    G4double pressure = 20.0 * bar;
+    //G4double pressure = 20.0 * bar;
     G4double temperature = 300. * kelvin;
     material = new G4Material(material_name, density, 1,
-			                        kStateGas, temperature, pressure);
+			                        kStateGas, temperature, fpressure);
     G4Element* Ne = G4NistManager::Instance()->FindOrBuildElement("Ne");
     material->AddElement(Ne,1);
   }
@@ -161,16 +170,61 @@ G4Material* DetectorConstruction::DefineXenon() const
 {
   G4String material_name = "GXe";
   G4double density = 88.56 * kg/m3;
-  G4double pressure = 15.0 * bar;
+  //G4double pressure = 15.0 * bar;
   G4double temperature = 300. * kelvin;
+  G4double sc_yield = 20000*1/MeV; // Estimated ~50 photons/eV
 
   G4Material* material = new G4Material(material_name, density, 1,
-			    kStateGas, temperature, pressure);
+			    kStateGas, temperature, fpressure);
   G4Element* Xe = G4NistManager::Instance()->FindOrBuildElement("Xe");
   material->AddElement(Xe,1);
   
+  // Add optical properties
+  G4MaterialPropertiesTable* GXe_mpt = new G4MaterialPropertiesTable();
+  const G4int NUMENTRIES = 9;
+  G4double ri_energy[NUMENTRIES] 
+    = {1*eV, 2*eV, 3*eV, 5*eV, 6*eV, 7*eV, 8*eV, 9*eV};
+  
+  G4double rindex[NUMENTRIES];
+
+  for (G4int i=0; i<NUMENTRIES; i++) {
+    rindex[i] = RefractiveIndex(ri_energy[i]);
+    G4cout << ri_energy[i]/eV <<  ", " << rindex[i] << G4endl;                               
+  }
+
+  // Sampling from ~150 nm to 200 nm <----> from 6.20625 eV to 8.20625 eV                                  
+  const G4int sc_entries = 500;
+  G4double sc_energy[sc_entries];
+  for (int j=0;j<sc_entries;j++){
+    sc_energy[j] =  6.20625*eV + 0.004*j*eV;
+  }
+  G4double intensity[sc_entries];
+  for (G4int i=0; i<sc_entries; i++){
+    intensity[i] = Scintillation(sc_energy[i]);
+    G4cout << intensity[i] << ", " << sc_energy[i]/eV << G4endl;
+  }
+
+  GXe_mpt->AddProperty("RINDEX", ri_energy, rindex, NUMENTRIES);
+  //GXe_mpt->AddProperty("FASTCOMPONENT", sc_energy, intensity, sc_entries);
+  //GXe_mpt->AddProperty("ELSPECTRUM", sc_energy, intensity, sc_entries);
+  //GXe_mpt->AddProperty("SLOWCOMPONENT", sc_energy, intensity, sc_entries);
+  GXe_mpt->AddConstProperty("SCINTILLATIONYIELD", sc_yield);
+  GXe_mpt->AddConstProperty("RESOLUTIONSCALE", 1.0);
+  //GXe_mpt->AddConstProperty("FASTTIMECONSTANT",4.5*ns);
+  //GXe_mpt->AddConstProperty("SLOWTIMECONSTANT",100.*ns);
+  //GXe_mpt->AddConstProperty("ELTIMECONSTANT", 50.*ns);                                                 
+  GXe_mpt->AddConstProperty("YIELDRATIO",.1);
+  GXe_mpt->AddConstProperty("ATTACHMENT", 1000.*ms);
+
+  G4double energy[2] = {0.01*eV, 100.*eV};
+  G4double abslen[2] = {1.e8*m, 1.e8*m};
+  GXe_mpt->AddProperty("ABSLENGTH", energy, abslen, 2);
+
+  material->SetMaterialPropertiesTable(GXe_mpt);
+
   return material;
 }
+
 
 G4MaterialPropertiesTable* DetectorConstruction::PTFE(){
 
@@ -185,4 +239,80 @@ G4MaterialPropertiesTable* DetectorConstruction::PTFE(){
   teflon_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, REFL_NUMENTRIES);
 
   return teflon_mpt;
+}
+
+G4double DetectorConstruction::Scintillation(G4double energy) const
+{
+  // FWHM and peak of emission extracted from paper:                                                     
+  // Physical review A, Volume 9, Number 2,                                                              
+  // February 1974. Koehler, Ferderber, Redhead and Ebert.                                               
+  // Pressure must be in atm = bar                                                                       
+
+  G4double pressure = fpressure/atmosphere;
+
+  G4double Wavelength_peak = (0.05 * pressure + 169.45)*nm;
+    G4double Wavelength_sigma =
+      2.*sqrt(2*log(2)) * (-0.117 * pressure + 15.42)*nm;
+
+    G4double Energy_peak = (CLHEP::h_Planck*CLHEP::c_light/Wavelength_peak);
+    G4double Energy_sigma = (CLHEP::h_Planck*CLHEP::c_light*Wavelength_sigma/pow(Wavelength_peak,2));
+    // G4double bin = 6*Energy_sigma/500;                                                                  
+
+    G4double intensity =
+      exp(-pow(Energy_peak/eV-energy/eV,2)/(2*pow(Energy_sigma/eV, 2)))/(Energy_sigma/eV*sqrt(CLHEP::pi*2.));
+
+    return intensity;
+}
+
+
+G4double DetectorConstruction::RefractiveIndex(G4double energy) const
+{
+  
+  // Formula for the refractive index taken from                                                         
+  // A. Baldini et al., "Liquid Xe scintillation calorimetry                                             
+  // and Xe optical properties", arXiv:physics/0401072v1 [physics.ins-det]                               
+
+  // The Lorentz-Lorenz equation (also known as Clausius-Mossotti equation)                              
+  // relates the refractive index of a fluid with its density:                                           
+  // (n^2 - 1) / (n^2 + 2) = - A · d_M,     (1)                                                          
+  // where n is the refractive index, d_M is the molar density and                                       
+  // A is the first refractivity viral coefficient:                                                      
+  // A(E) = \sum_i^3 P_i / (E^2 - E_i^2),   (2)                                                          
+  // with:                                                                                               
+  G4double P[3] = {71.23, 77.75, 1384.89}; // [eV^3 cm3 / mole]                                          
+  G4double E[3] = {8.4, 8.81, 13.2};       // [eV]                                                       
+
+  // Note.- Equation (1) has, actually, a sign difference with respect                                   
+  // to the one appearing in the reference. Otherwise, it yields values                                  
+  // for the refractive index below 1.                                                                   
+
+  // Let's calculate the virial coefficient.                                                             
+  // We won't use the implicit system of units of Geant4 because                                         
+  // it results in loss of numerical precision.                                                          
+
+  energy = energy / eV;
+  G4double virial = 0.;
+
+  for (G4int i=0; i<3; i++)
+    virial = virial + P[i] / (energy*energy - E[i]*E[i]);
+
+  // Need to use g/cm3                                                                                   
+  G4double density = 88.56 * kg/m3; //Density(_pressure) / g * cm3;
+
+  G4double mol_density = density / 131.29;
+  G4double alpha = virial * mol_density;
+
+  // Isolating now the n2 from equation (1) and taking the square root                                   
+  G4double n2 = (1. - 2*alpha) / (1. + alpha);
+  if (n2 < 1.) {
+    //      G4String msg = "Non-physical refractive index for energy "                                        
+    // + bhep::to_string(energy) + " eV. Use n=1 instead.";                                            
+    //      G4Exception("[XenonGasProperties]", "RefractiveIndex()",                                          
+    //        JustWarning, msg);                                                                       
+    n2 = 1.;
+  }
+  
+  
+  // Currently don't care about changing index based on energy
+  return sqrt(n2);
 }

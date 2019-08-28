@@ -17,6 +17,7 @@
 #include <G4PrimaryParticle.hh>
 #include <G4PrimaryVertex.hh>
 #include <G4Event.hh>
+#include <Randomize.hh>
 
 PrimaryGeneration::PrimaryGeneration():
   G4VUserPrimaryGeneratorAction(),
@@ -47,37 +48,20 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   G4ParticleDefinition* particle_definition = G4IonTable::GetIonTable()->
     GetIon(Z, A, exitEnergy);
 
-  fParticleGun->SetParticleDefinition(particle_definition);
-  fParticleGun->GeneratePrimaryVertex(event);
-
-
-  //if (!particle_definition){
-  //  G4Exception("SetParticleDefinition()", "[IonGun]",
-  //		FatalException, " can not create ion");
-  //}
+  // Generate random position within a cylinder
+  G4double det_r = 0.5*m; // radius of Xenon chamber
+  G4double det_z = 1.*m; // length of Xenon chamger     
+  // FIXME: should make this automatic base on DetectorConstruction..
   
-  // Generate an initial position for the particle using the geometry                                                 
-  //G4ThreeVector position = new G4ThreeVector(0,0,0); //_geom->GenerateVertex(_region);
-  // Particle generated at start-of-event                                                                             
-  //G4double time = 0.;
-  // Create a new vertex                                                                                              
-  //G4PrimaryVertex* vertex = new G4PrimaryVertex(G4ThreeVector(1.,0.,0.), time);
+  G4double rand = G4UniformRand(); // random number between 0 and 1
+  G4double rand_phi = G4UniformRand()*2.*CLHEP::pi;
+  G4double rand_r = det_r*sqrt(rand);
+  G4double rand_x = rand_r*cos(rand_phi);
+  G4double rand_y = rand_r*sin(rand_phi);
+  G4double rand_z = (G4UniformRand()-0.5)*det_z;
 
-  // Create the new primary particle and set it some properties                                                       
-  //G4PrimaryParticle* particle =
-  //  new G4PrimaryParticle(particle_definition);
-
-  // Add particle to the vertex and this to the event                                                                 
-  //vertex->SetPrimary(particle);
-  //event->AddPrimaryVertex(vertex);
-
-  //TFile* MyFile = new TFile("MyFile.root", "UPDATE");
-
-  //G4int num_particles = vertex->GetNumberOfParticle();
-  //G4ThreeVector particle_energy = particle->GetMomentum();
-  //std::cout << "-------------- Particle momx: " <<particle_energy.x()/keV <<" [keV] -----------------\n";
-  //std::cout << "--------------- Number of particles: " << num_particles << " ---------------\n";
-
-  //particle_energy = particle->GetNext();
+  fParticleGun->SetParticleDefinition(particle_definition);
+  fParticleGun->SetParticlePosition(G4ThreeVector(rand_x, rand_y, rand_z));
+  fParticleGun->GeneratePrimaryVertex(event);
   
 }

@@ -2,7 +2,7 @@
 //  G4Basic | PrimaryGeneration.h
 //
 //  Class for the definition of the primary generation action.
-//   * Author: Justo Martin-Albo
+//   * Author: Justo Martin-Albo, Taylor Contreras
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 

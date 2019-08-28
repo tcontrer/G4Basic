@@ -7,13 +7,19 @@
 // -----------------------------------------------------------------------------
 
 #include "RunAction.h"
-//#include "TFile.h"
+
+#include <G4AccumulableManager.hh>
 #include <string.h>
 #include <iostream>
 using namespace std;
 
-RunAction::RunAction(): G4UserRunAction()
+RunAction::RunAction()
+  : G4UserRunAction(),
+  fEdep(0.)
 {
+  // Register accumulable to the accumulable manager
+  G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
+  accumulableManager->RegisterAccumulable(fEdep);
 }
 
 
@@ -24,12 +30,13 @@ RunAction::~RunAction()
 
 void RunAction::BeginOfRunAction(const G4Run*)
 {
-
-  //TFile* MyFile = new TFile("G4Basic.root", "RECREATE");
-  //cout << "\n\n\n------------------- RunAction ------------------------\n\n\n";
 }
 
 
 void RunAction::EndOfRunAction(const G4Run*)
 {
+}
+
+void RunAction::AddEdep(G4double edep){
+  fEdep += edep;
 }

@@ -2,13 +2,14 @@
 //  G4Basic | G4Basic.cpp
 //
 //  Main program of the G4Basic detector simulation.
-//   * Author: Justo Martin-Albo
+//   * Author: Justo Martin-Albo, Taylor Contreras
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 
 #include "DetectorConstruction.h"
 #include "PrimaryGeneration.h"
 #include "SteppingAction.h"
+#include "RunAction.h"
 
 #include <G4RunManager.hh>
 #include <G4UImanager.hh>
@@ -20,6 +21,8 @@
 #include <G4RadioactiveDecayPhysics.hh>
 
 #include "TFile.h"
+#include "TTree.h"
+#include "TH1F.h"
 
 int main(int argc, char** argv)
 {
@@ -29,25 +32,27 @@ int main(int argc, char** argv)
   if ( argc == 1 ) {
     ui = new G4UIExecutive(argc, argv);
   }
-
-  // make output file
-  TFile* MyFile = new TFile("MyFile.root", "RECREATE");
-
+  
   // Construct the run manager and set the initialization classes
   G4RunManager* runmgr = new G4RunManager();
 
-  G4VModularPhysicsList* physics_list = new G4VModularPhysicsList();  //FTFP_BERT_HP();
-
+  // Set the physics used for this simulation
+  G4VModularPhysicsList* physics_list = new G4VModularPhysicsList();
   physics_list->RegisterPhysics(new G4OpticalPhysics());
   physics_list->RegisterPhysics(new G4EmStandardPhysics_option4());
   physics_list->RegisterPhysics(new G4RadioactiveDecayPhysics());
   runmgr->SetUserInitialization(physics_list);
 
+  // set up detector geometry
   runmgr->SetUserInitialization(new DetectorConstruction());
 
+  // set user action classes
   runmgr->SetUserAction(new PrimaryGeneration());
-
-  runmgr->SetUserAction(new SteppingAction());
+  RunAction* runAction = new RunAction();
+  runmgr->SetUserAction(runAction);
+  EventAction* eventAction = new EventAction(runAction);
+  runmgr->SetUserAction(eventAction);
+  runmgr->SetUserAction(new SteppingAction(eventAction));
 
   // Initialize visualization
   G4VisManager* vismgr = new G4VisExecutive();
