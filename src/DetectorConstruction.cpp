@@ -179,6 +179,7 @@ G4Material* DetectorConstruction::DefineXenon() const
   G4Element* Xe = G4NistManager::Instance()->FindOrBuildElement("Xe");
   material->AddElement(Xe,1);
   
+  /*
   // Add optical properties
   G4MaterialPropertiesTable* GXe_mpt = new G4MaterialPropertiesTable();
   const G4int NUMENTRIES = 9;
@@ -219,9 +220,9 @@ G4Material* DetectorConstruction::DefineXenon() const
   G4double energy[2] = {0.01*eV, 100.*eV};
   G4double abslen[2] = {1.e8*m, 1.e8*m};
   GXe_mpt->AddProperty("ABSLENGTH", energy, abslen, 2);
-
+  
   material->SetMaterialPropertiesTable(GXe_mpt);
-
+  */
   return material;
 }
 
@@ -237,7 +238,7 @@ G4MaterialPropertiesTable* DetectorConstruction::PTFE(){
   G4double REFLECTIVITY[REFL_NUMENTRIES] = {.72, .72};
   
   teflon_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, REFL_NUMENTRIES);
-
+  
   return teflon_mpt;
 }
 

@@ -10,6 +10,7 @@
 #define STEPPING_ACTION_H
 
 #include "EventAction.h"
+#include "RunAction.h"
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -20,15 +21,15 @@
 class SteppingAction: public G4UserSteppingAction
 {
   public:
-    SteppingAction(EventAction* eventAction);
+  SteppingAction(EventAction* eventAction, RunAction* runAction);
     virtual ~SteppingAction();
     virtual void UserSteppingAction(const G4Step*);
 
  private:    
     EventAction* fEventAction;
+    RunAction* fRunAction;
     G4LogicalVolume* fEnergyPlane;
     G4LogicalVolume* fTrackingPlane;
-    std::map<int, float> fTrackMap;
     TFile* fMyFile;
     TH1F* fhedep;
 };

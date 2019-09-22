@@ -47,12 +47,12 @@ int main(int argc, char** argv)
   runmgr->SetUserInitialization(new DetectorConstruction());
 
   // set user action classes
-  runmgr->SetUserAction(new PrimaryGeneration());
   RunAction* runAction = new RunAction();
   runmgr->SetUserAction(runAction);
+  runmgr->SetUserAction(new PrimaryGeneration(runAction));
   EventAction* eventAction = new EventAction(runAction);
   runmgr->SetUserAction(eventAction);
-  runmgr->SetUserAction(new SteppingAction(eventAction));
+  runmgr->SetUserAction(new SteppingAction(eventAction, runAction));
 
   // Initialize visualization
   G4VisManager* vismgr = new G4VisExecutive();

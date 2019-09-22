@@ -19,9 +19,10 @@
 #include <G4Event.hh>
 #include <Randomize.hh>
 
-PrimaryGeneration::PrimaryGeneration():
+PrimaryGeneration::PrimaryGeneration(RunAction* runAction):
   G4VUserPrimaryGeneratorAction(),
-  fParticleGun(0)
+  fParticleGun(0),
+  fRunAction(runAction)
 {
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
@@ -64,4 +65,6 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   fParticleGun->SetParticlePosition(G4ThreeVector(rand_x, rand_y, rand_z));
   fParticleGun->GeneratePrimaryVertex(event);
   
+  fRunAction->FillInitials(rand_x, rand_y, rand_z);
+  //G4cout << "\n\n"<<rand_x<<" "<<rand_y<<" "<<rand_z <<"\n\n"<<G4endl;
 }

@@ -1,0 +1,11 @@
+# Macro file for testing G4Basic
+#
+# Can be run in batch, without graphics
+# or interactively: Idle> /control/execute testrun.mac 
+#
+#
+# Initialize kernel
+/run/initialize
+#
+# Run events
+/run/beamOn 1000

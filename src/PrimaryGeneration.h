@@ -9,6 +9,8 @@
 #ifndef PRIMARY_GENERATION_H
 #define PRIMARY_GENERATION_H
 
+#include "RunAction.h"
+
 #include <G4VUserPrimaryGeneratorAction.hh>
 #include "G4ParticleGun.hh"
 #include "globals.hh"
@@ -19,13 +21,14 @@ class G4ParticleDefinition;
 class PrimaryGeneration: public G4VUserPrimaryGeneratorAction
 {
 public:
-  PrimaryGeneration();
+  PrimaryGeneration(RunAction* runAction);
   virtual ~PrimaryGeneration();
   virtual void GeneratePrimaries(G4Event*);
   G4ParticleGun* GetParticleGun() { return fParticleGun;};
 
  private:
   G4ParticleGun* fParticleGun;
+  RunAction* fRunAction;
 };
 
 #endif

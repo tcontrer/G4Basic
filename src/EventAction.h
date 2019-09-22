@@ -11,9 +11,6 @@
 
 #include "RunAction.h"
 
-#include "TFile.h"
-#include "TH1F.h"
-
 #include <G4UserEventAction.hh>
 
 class EventAction: public G4UserEventAction
@@ -25,17 +22,14 @@ public:
   virtual void EndOfEventAction(const G4Event*);
 
   void AddEdep(G4double edep) { fEdep += edep;}
-  void AddNumPhotons() {fNumPhotons++;}
-  void Fill(G4double edep);
-  //TFile* GetMyFile() {return fMyFile;}
-  TObject* Get_hedep();
+  void FillTrackMap(G4int trackid) {fTrackMap[trackid] = trackid;}
+  std::map<int, int> GetTrackMap() {return fTrackMap;}
+  //void AddNumPhotons() {fNumPhotons++;}
 
  private:
   RunAction* fRunAction;
   G4double fEdep;
-  G4int fNumPhotons;
-  TFile* fMyFile;
-  TH1F* fhedep;
+  std::map<int, int> fTrackMap;
 };
 
 #endif
