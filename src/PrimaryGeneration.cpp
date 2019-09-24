@@ -56,7 +56,7 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   
   G4double rand = G4UniformRand(); // random number between 0 and 1
   G4double rand_phi = G4UniformRand()*2.*CLHEP::pi;
-  G4double rand_r = det_r*sqrt(rand);
+  G4double rand_r = det_r*std::sqrt(rand);
   G4double rand_x = rand_r*cos(rand_phi);
   G4double rand_y = rand_r*sin(rand_phi);
   G4double rand_z = (G4UniformRand()-0.5)*det_z;
