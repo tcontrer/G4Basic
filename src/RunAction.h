@@ -36,7 +36,8 @@ public:
   std::map<int,std::map<int,float>> fxfinMap;
   std::map<int,std::map<int,float>> fyfinMap;
   std::map<int,std::map<int,float>> fzfinMap;
-  std::map<int,std::map<int,float>> fpidMap;
+  std::map<int,std::map<int,int>> fpidMap;
+  std::map<int,std::map<int,int>> ftrackMap;
 };
 
 #endif

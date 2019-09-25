@@ -66,7 +66,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   std::map<int, int> TrackMap = fEventAction->GetTrackMap();
   G4TrackStatus status = track->GetTrackStatus();
   if (status != fAlive){
-    //G4cout << "Trackid: "<<trackid<<"\n"<<G4endl;
+    //G4cout << "Trackid: "<<trackid<<" pid: "<<track->GetParticleDefinition()->GetPDGEncoding()<<"\n"<<G4endl;
 
     std::map<int, int>::iterator it = TrackMap.find(trackid);
     if (it == TrackMap.end()){
