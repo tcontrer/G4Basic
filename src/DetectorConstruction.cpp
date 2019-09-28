@@ -195,34 +195,58 @@ G4Material* DetectorConstruction::DefineXenon() const
 
   // Sampling from ~150 nm to 200 nm <----> from 6.20625 eV to 8.20625 eV                                  
   const G4int sc_entries = 500;
-  G4double sc_energy[sc_entries];
-  for (int j=0;j<sc_entries;j++){
-    sc_energy[j] =  6.20625*eV + 0.004*j*eV;
-  }
-  G4double intensity[sc_entries];
-  for (G4int i=0; i<sc_entries; i++){
+  G4double sc_energy[NUMENTRIES] = {6.6*eV, 6.7*eV, 6.8*eV, 6.9*eV,
+				    7.0*eV, 7.1*eV, 7.2*eV, 7.3*eV, 7.4*eV };
+  //for (int j=0;j<sc_entries;j++){
+  //  sc_energy[j] =  6.20625*eV + 0.004*j*eV;
+  //}
+  
+  G4double intensity[NUMENTRIES]; // = { 0.000134, 0.004432, 0.053991, 0.241971,
+  //			      0.398942, 0.000134, 0.004432, 0.053991,
+  //			      0.241971 };
+  for (G4int i=0; i<NUMENTRIES; i++){
     intensity[i] = Scintillation(sc_energy[i]);
     G4cout << intensity[i] << ", " << sc_energy[i]/eV << G4endl;
   }
 
-  GXe_mpt->AddProperty("RINDEX", ri_energy, rindex, NUMENTRIES);
-  //GXe_mpt->AddProperty("FASTCOMPONENT", sc_energy, intensity, sc_entries);
+  GXe_mpt->AddProperty("RINDEX", sc_energy, rindex, NUMENTRIES);
+  GXe_mpt->AddProperty("FASTCOMPONENT", sc_energy, intensity, NUMENTRIES);
   //GXe_mpt->AddProperty("ELSPECTRUM", sc_energy, intensity, sc_entries);
   //GXe_mpt->AddProperty("SLOWCOMPONENT", sc_energy, intensity, sc_entries);
   GXe_mpt->AddConstProperty("SCINTILLATIONYIELD", sc_yield);
-  GXe_mpt->AddConstProperty("RESOLUTIONSCALE", 1.0);
-  //GXe_mpt->AddConstProperty("FASTTIMECONSTANT",4.5*ns);
+  //GXe_mpt->AddConstProperty("RESOLUTIONSCALE", 1.0);
+  GXe_mpt->AddConstProperty("FASTTIMECONSTANT",1.0*ns); // emmisiont timeing of photons
   //GXe_mpt->AddConstProperty("SLOWTIMECONSTANT",100.*ns);
   //GXe_mpt->AddConstProperty("ELTIMECONSTANT", 50.*ns);                                                 
   GXe_mpt->AddConstProperty("YIELDRATIO",.1);
-  GXe_mpt->AddConstProperty("ATTACHMENT", 1000.*ms);
+  //GXe_mpt->AddConstProperty("ATTACHMENT", 1000.*ms);
 
   G4double energy[2] = {0.01*eV, 100.*eV};
   G4double abslen[2] = {1.e8*m, 1.e8*m};
-  GXe_mpt->AddProperty("ABSLENGTH", energy, abslen, 2);
+  //GXe_mpt->AddProperty("ABSLENGTH", energy, abslen, 2);
   
   material->SetMaterialPropertiesTable(GXe_mpt);
   */
+  
+  // Geant4 Liquid Xenon example
+  const G4int LXe_NUMENTRIES = 3;
+  G4double LXe_Energy[LXe_NUMENTRIES]    = { 7.0*eV , 7.07*eV, 7.14*eV };
+
+  G4double LXe_SCINT[LXe_NUMENTRIES] = { 0.1, 1.0, 0.1 };
+  G4double LXe_RIND[LXe_NUMENTRIES]  = {1.0, 1.0, 1.0};//{ 1.59 , 1.57, 1.54 };
+  G4double LXe_ABSL[LXe_NUMENTRIES]  = {1.e8*m, 1.e8*m, 1.e8*m}; //{ 35.*cm, 35.*cm, 35.*cm}; 
+  G4MaterialPropertiesTable* LXe_mt = new G4MaterialPropertiesTable();
+  LXe_mt->AddProperty("FASTCOMPONENT", LXe_Energy, LXe_SCINT, LXe_NUMENTRIES);
+  //LXe_mt->AddProperty("SLOWCOMPONENT", LXe_Energy, LXe_SCINT, LXe_NUMENTRIES);
+  LXe_mt->AddProperty("RINDEX",        LXe_Energy, LXe_RIND,  LXe_NUMENTRIES);
+  LXe_mt->AddProperty("ABSLENGTH",     LXe_Energy, LXe_ABSL,  LXe_NUMENTRIES);
+  LXe_mt->AddConstProperty("SCINTILLATIONYIELD",sc_yield); 
+  LXe_mt->AddConstProperty("RESOLUTIONSCALE",1.0);
+  LXe_mt->AddConstProperty("FASTTIMECONSTANT",1.*ns);
+  //LXe_mt->AddConstProperty("SLOWTIMECONSTANT",45.*ns);
+  LXe_mt->AddConstProperty("YIELDRATIO",1.0);
+  material->SetMaterialPropertiesTable(LXe_mt);
+  
   return material;
 }
 
