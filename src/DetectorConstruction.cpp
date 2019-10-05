@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------------
 
 #include "DetectorConstruction.h"
+#include "SDPlanes.h"
 
 #include <G4Box.hh>
 #include <G4Tubs.hh>
@@ -18,6 +19,7 @@
 #include <G4MaterialPropertiesTable.hh>
 #include <G4OpticalSurface.hh>
 #include <G4LogicalSkinSurface.hh>
+#include <G4SDManager.hh>
 
 DetectorConstruction::DetectorConstruction()
   : G4VUserDetectorConstruction(),
@@ -92,7 +94,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 		barrel_logic_vol, barrel_name, world_logic_vol, false, 0, true);
   
   // TRACKING PLANE //////////////////////////////////////////////
-  // FIXME: make optical surface to count photons absorbed
+  // FIXME: make sensitive detector
 
   G4String tracking_name = "TRACKING_PLANE";
   G4double tracking_diam = barrel_inner_diam + barrel_thickness*2.;
@@ -105,6 +107,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   
   G4LogicalVolume* tracking_logic_vol = 
     new G4LogicalVolume(tracking_solid_vol, tracking_mat, tracking_name);
+
+  // Define this volume as sensistive plane detector
+  SDPlanes* trackingplane = new SDPlanes("/TrackingPlane");
+  tracking_logic_vol->SetSensitiveDetector(trackingplane);
+  G4SDManager::GetSDMpointer()->AddNewDetector(trackingplane);
 
   new G4PVPlacement(0, tracking_pos, 
 		    tracking_logic_vol, tracking_name, world_logic_vol, false, 0, true);
@@ -245,6 +252,10 @@ G4Material* DetectorConstruction::DefineXenon() const
   LXe_mt->AddConstProperty("FASTTIMECONSTANT",1.*ns);
   //LXe_mt->AddConstProperty("SLOWTIMECONSTANT",45.*ns);
   LXe_mt->AddConstProperty("YIELDRATIO",1.0);
+
+  LXe_mt->AddProperty("ELSPECTRUM", LXe_Energy, LXe_SCINT, LXe_NUMENTRIES);  
+  LXe_mt->AddConstProperty("ELTIMECONSTANT", 50.*ns);
+
   material->SetMaterialPropertiesTable(LXe_mt);
   
   return material;

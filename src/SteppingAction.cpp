@@ -72,6 +72,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     if (it == TrackMap.end()){
       //G4cout <<"new!\n"<<G4endl;
       G4int pid = track->GetParticleDefinition()->GetPDGEncoding();
+      //G4cout << "particle: "<< track->GetParticleDefinition()->GetParticleName() << " "<<pid<<"\n" << G4endl;
       const G4ThreeVector& pos = track->GetPosition();
       fRunAction->FillFinals(pos.getX(), pos.getY(), pos.getZ(), pid, trackid);
       TrackMap[trackid] = trackid;

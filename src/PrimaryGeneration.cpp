@@ -64,7 +64,8 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   fParticleGun->SetParticleDefinition(particle_definition);
   fParticleGun->SetParticlePosition(G4ThreeVector(rand_x, rand_y, rand_z));
   fParticleGun->GeneratePrimaryVertex(event);
-  
-  fRunAction->FillInitials(rand_x, rand_y, rand_z);
+
+  G4int eventid = event->GetEventID();
+  fRunAction->FillInitials(rand_x, rand_y, rand_z, eventid);
   //G4cout << "\n\n"<<rand_x<<" "<<rand_y<<" "<<rand_z <<"\n\n"<<G4endl;
 }

@@ -45,7 +45,7 @@ void RunAction::EndOfRunAction(const G4Run*)
   int numtracks = fxfinMap[0].size();
   
   float edep, xinit, yinit, zinit, xfin, yfin, zfin, dpos;
-  int pid, trackid;
+  int pid, trackid, eventid;
 
   TFile* MyFile = new TFile("MyFile.root", "RECREATE");
   TTree* tree1 = new TTree("tree1", "");
@@ -60,6 +60,7 @@ void RunAction::EndOfRunAction(const G4Run*)
   tree2->Branch("npid", &pid, "pid/I");
   tree2->Branch("ntrackid", &trackid, "trackid/I");
   tree2->Branch("ndpos", &dpos, "dpos/F");
+  tree2->Branch("nevent", &eventid, "eventid/I");
 
   for (int i=0; i<numevents; i++){
     //G4cout << "Event num in filling files: " << i<<"\n"<<G4endl;
@@ -67,6 +68,7 @@ void RunAction::EndOfRunAction(const G4Run*)
     xinit = fxinitMap[i]/cm;
     yinit = fyinitMap[i]/cm;
     zinit = fzinitMap[i]/cm;
+    eventid = feventids[i];
 
     numtracks = fxfinMap[i].size();
     //G4cout <<"Size: "<<size << G4endl;
@@ -77,9 +79,9 @@ void RunAction::EndOfRunAction(const G4Run*)
       zfin = fzfinMap[i][j]/cm;
       pid = fpidMap[i][j];
       trackid = ftrackMap[i][j];
-      
-      dpos = sqrt(pow(xinit - xfin,2.0) + pow(yinit - yfin,2.0) + pow(zinit - zfin,2.0));
 
+      dpos = sqrt(pow(xinit - xfin,2.0) + pow(yinit - yfin,2.0) + pow(zinit - zfin,2.0));
+      //G4cout << "pid: " << pid <<"\n"<< G4endl;
       tree2->Fill();
     }
 
@@ -96,13 +98,14 @@ void RunAction::AddEdep(G4double edep){
   fEdepMap[feventnum] = edep;
 }
 
-void RunAction::FillInitials(G4double x, G4double y, G4double z){
+void RunAction::FillInitials(G4double x, G4double y, G4double z, int eventid){
 
   //G4cout << "EventNum for getting events: "<<feventnum<<"\n" <<G4endl;
   
   fxinitMap[feventnum] = x;
   fyinitMap[feventnum] = y;
   fzinitMap[feventnum] = z;
+  feventids[feventnum] = eventid;
 
   //G4cout << "\nFilling Initial Maps:" << fxinitMap[feventnum]<<"\n"<<G4endl;
 }
