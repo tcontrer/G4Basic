@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
 //  G4Basic | SteppingAction.H
 //
-//  Definition of detector geometry and materials.
-//   * Author: Justo Martin-Albo, Taylor Contreras
+// 
+//   * Author: Taylor Contreras, Justo Martin-Albo
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 

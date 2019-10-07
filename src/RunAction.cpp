@@ -2,7 +2,7 @@
 //  G4Basic | RunAction.h
 //
 //
-//   * Author: Justo Martin-Albo, Taylor Contreras
+//   * Author: Taylor Contreras, Justo Martin-Albo
 //   * Creation date: 15 Aug 2019
 // -----------------------------------------------------------------------------
 

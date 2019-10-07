@@ -2,12 +2,11 @@
 //  G4Basic | DetectorConstruction.cpp
 //
 //  Definition of detector geometry and materials.
-//   * Author: Justo Martin-Albo, Taylor Contreras
+//   * Author: Taylor Contreras, Justo Martin-Albo
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 
 #include "DetectorConstruction.h"
-#include "SDPlanes.h"
 
 #include <G4Box.hh>
 #include <G4Tubs.hh>
@@ -19,7 +18,6 @@
 #include <G4MaterialPropertiesTable.hh>
 #include <G4OpticalSurface.hh>
 #include <G4LogicalSkinSurface.hh>
-#include <G4SDManager.hh>
 
 DetectorConstruction::DetectorConstruction()
   : G4VUserDetectorConstruction(),
@@ -94,7 +92,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 		barrel_logic_vol, barrel_name, world_logic_vol, false, 0, true);
   
   // TRACKING PLANE //////////////////////////////////////////////
-  // FIXME: make sensitive detector
+  // FIXME: make optical surface with effecienty (rather than sensitive detector)
 
   G4String tracking_name = "TRACKING_PLANE";
   G4double tracking_diam = barrel_inner_diam + barrel_thickness*2.;
@@ -108,11 +106,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4LogicalVolume* tracking_logic_vol = 
     new G4LogicalVolume(tracking_solid_vol, tracking_mat, tracking_name);
 
-  // Define this volume as sensistive plane detector
-  SDPlanes* trackingplane = new SDPlanes("/TrackingPlane");
-  tracking_logic_vol->SetSensitiveDetector(trackingplane);
-  G4SDManager::GetSDMpointer()->AddNewDetector(trackingplane);
-
+  // Optical Properties of plane
+  G4OpticalSurface* tracking_plane = new G4OpticalSurface("TRACKING_SURFACE");
+  tracking_plane->SetMaterialPropertiesTable(OpticalPlane());
+  new G4LogicalSkinSurface("TRACKING_PLANE", tracking_logic_vol, tracking_plane);
   new G4PVPlacement(0, tracking_pos, 
 		    tracking_logic_vol, tracking_name, world_logic_vol, false, 0, true);
 
@@ -129,6 +126,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4LogicalVolume* energy_logic_vol =
     new G4LogicalVolume(energy_solid_vol, energy_mat, energy_name);
 
+  // Optical Properties of plane
+  G4OpticalSurface* energy_plane = new G4OpticalSurface("ENERGY_SURFACE");
+  energy_plane->SetMaterialPropertiesTable(OpticalPlane());
+  new G4LogicalSkinSurface("ENERGY_PLANE", energy_logic_vol, energy_plane);
   new G4PVPlacement(0, energy_pos,
                     energy_logic_vol, energy_name, world_logic_vol, false, 0, true);
 
@@ -275,6 +276,21 @@ G4MaterialPropertiesTable* DetectorConstruction::PTFE(){
   teflon_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, REFL_NUMENTRIES);
   
   return teflon_mpt;
+}
+
+G4MaterialPropertiesTable* DetectorConstruction::OpticalPlane(){
+
+  G4MaterialPropertiesTable* plane_mpt = new G4MaterialPropertiesTable();
+
+  // define props for a given number of energies
+  const G4int NUMENTRIES = 2;
+
+  G4double ENERGIES[NUMENTRIES] = {1.0*eV, 30.*eV};
+  G4double EFFICIENCY[NUMENTRIES] = {1.0, 1.0};
+
+  plane_mpt->AddProperty("EFFICIENCY", ENERGIES, EFFICIENCY, NUMENTRIES);
+  
+  return plane_mpt;
 }
 
 G4double DetectorConstruction::Scintillation(G4double energy) const

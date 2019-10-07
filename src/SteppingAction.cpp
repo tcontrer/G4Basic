@@ -1,8 +1,8 @@
 // -----------------------------------------------------------------------------
 //  G4Basic | SteppingAction.cpp
 //
-//  Definition of detector geometry and materials.
-//   * Author: Justo Martin-Albo, Taylor Contreras
+//  
+//   * Author: Taylor Contreras, Justo Martin-Albo
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 
@@ -35,11 +35,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4Track* track = step->GetTrack();
   G4int trackid = track->GetTrackID();
   
-  // check if particle is in map
-  // if it is not, make a new key
-  // check if dead or not
-  // if dead, then add edep total to hedep
-  
   const DetectorConstruction* detectorConstruction 
     = static_cast<const DetectorConstruction*>
     ( G4RunManager::GetRunManager()->GetUserDetectorConstruction());
@@ -53,16 +48,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   
   G4double edepStep = step->GetTotalEnergyDeposit();
   fEventAction->AddEdep(edepStep);
-  //std::map<int, int>::iterator it = fTrackMap.find(trackid);
-  //if (it != fTrackMap.end()){
-    //track already a key in TrackMap
-  //  it->second += edepStep;
-  //}
-  //else {
-    // track must be added to map
-  //  flasttrack = trackid;
-  //  fTrackMap.insert(std::pair<int, float>(trackid, edepStep));
-  //}
+  
   std::map<int, int> TrackMap = fEventAction->GetTrackMap();
   G4TrackStatus status = track->GetTrackStatus();
   if (status != fAlive){
@@ -79,25 +65,4 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
     }
   }
-  
-  /*
-  G4TrackStatus status = track->GetTrackStatus();
-  if (status != fAlive){
-    std::cout <<"----- DEAD! ------\n";
-
-    const G4ThreeVector& pos = track->GetPosition();
-    const G4ParticleDefinition* pid = track->GetParticleDefinition();
-
-    std::cout <<"--------- Posx: " << pos.getX()/CLHEP::cm <<" [cm] ---------\n";
-    std::cout <<"--------- Particle id: " << pid->GetParticleName() << "------------\n";
-
-    if (volume == fEnergyPlane || volume == fTrackingPlane){
-      // count number of photons that reach planes
-      // FIXME
-      G4double edepStep = step->GetTotalEnergyDeposit();
-      fEventAction->AddEdep(edepStep);
-      fEventAction->AddNumPhotons();
-    }
-  }
-  */
 }

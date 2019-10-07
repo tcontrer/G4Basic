@@ -2,7 +2,7 @@
 //  G4Basic | PrimaryGeneration.cpp
 //
 //  Class for the definition of the primary generation action.
-//   * Author: Justo Martin-Albo, Taylor Contreras
+//   * Author: Taylor Contreras, Justo Martin-Albo
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 //  G4Basic | DetectorConstruction.h
 //
 //  Class for the definition of the detector geometry and materials.
-//   * Author: Justo Martin-Albo, Taylor Contreras
+//   * Author: Taylor Contreras, Justo Martin-Albo
 //   * Creation date: 14 Aug 2019
 // -----------------------------------------------------------------------------
 
@@ -30,6 +30,7 @@ private:
   G4Material* DefineNeon() const;
   G4Material* DefineXenon() const;
   G4MaterialPropertiesTable* PTFE();
+  G4MaterialPropertiesTable* OpticalPlane();
   G4double Scintillation(G4double energy) const;
   G4double RefractiveIndex(G4double energy) const;
   G4LogicalVolume* fEnergyPlane;
