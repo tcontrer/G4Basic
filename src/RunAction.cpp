@@ -39,17 +39,19 @@ void RunAction::BeginOfRunAction(const G4Run*)
 }
 
 
-void RunAction::EndOfRunAction(const G4Run*)
-{
+void RunAction::EndOfRunAction(const G4Run*){
+  // Make and fill output file with information from the run
+
   int numevents = fEdepMap.size();
   int numtracks = fxfinMap[0].size();
   
   float edep, xinit, yinit, zinit, xfin, yfin, zfin, dpos;
   int pid, trackid, eventid;
 
+  // Make output file and branches
   TFile* MyFile = new TFile("MyFile.root", "RECREATE");
-  TTree* tree1 = new TTree("tree1", "");
-  TTree* tree2 = new TTree("tree2", "");
+  TTree* tree1 = new TTree("tree1", ""); // for single fill per event
+  TTree* tree2 = new TTree("tree2", ""); // for multiple fills per event
   tree1->Branch("hedep", &edep, "edep/F");
   tree1->Branch("nxinit", &xinit, "xinit/F");
   tree1->Branch("nyinit", &yinit, "yinit/F");
@@ -63,6 +65,8 @@ void RunAction::EndOfRunAction(const G4Run*)
   tree2->Branch("nevent", &eventid, "eventid/I");
 
   for (int i=0; i<numevents; i++){
+    // Fill initial info and total edep from event
+
     //G4cout << "Event num in filling files: " << i<<"\n"<<G4endl;
     edep = fEdepMap[i]/keV;
     xinit = fxinitMap[i]/cm;
@@ -73,6 +77,8 @@ void RunAction::EndOfRunAction(const G4Run*)
     numtracks = fxfinMap[i].size();
     //G4cout <<"Size: "<<size << G4endl;
     for (int j=1; j<numtracks+1; j++){
+      // Fill final info on each particle in event
+
       //G4cout << "Inner loop: "<<j<<G4endl;
       xfin = fxfinMap[i][j]/cm;
       yfin = fyfinMap[i][j]/cm;

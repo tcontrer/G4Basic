@@ -7,9 +7,6 @@
 // -----------------------------------------------------------------------------
 
 #include "PrimaryGeneration.h"
-//#include "Kr83mGeneration.h"
-
-#include "TFile.h"
 
 #include <G4ParticleDefinition.hh>
 #include <G4SystemOfUnits.hh>
@@ -52,8 +49,7 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   // Generate random position within a cylinder
   G4double det_r = 0.5*m; // radius of Xenon chamber
   G4double det_z = 1.*m; // length of Xenon chamger     
-  // FIXME: should make this automatic base on DetectorConstruction..
-  
+  // FIXME: should make this automatic based on DetectorConstruction..  
   G4double rand = G4UniformRand(); // random number between 0 and 1
   G4double rand_phi = G4UniformRand()*2.*CLHEP::pi;
   G4double rand_r = det_r*std::sqrt(rand);

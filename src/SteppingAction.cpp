@@ -11,9 +11,12 @@
 #include "RunAction.h"
 
 #include "G4Step.hh"
+#include "G4StepStatus.hh"
 #include "G4Event.hh"
 #include "G4Track.hh"
 #include "G4RunManager.hh"
+#include "G4OpticalPhoton.hh"
+#include "G4OpBoundaryProcess.hh"
 
 SteppingAction::SteppingAction(EventAction* eventAction, RunAction* runAction): 
   G4UserSteppingAction(),
@@ -65,4 +68,41 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
     }
   }
+
+  // Do optical analysis stuff /////////////////////////////////////////
+  // FIXME: see if this can be combined with stuff above? 
+
+  G4ParticleDefinition* pdef = step->GetTrack()->GetDefinition();
+
+  // Only continue if it is an optical photon
+  if (pdef != G4OpticalPhoton::Definition()) return;
+  G4cout << " Optical Photon!\n" << G4endl;
+  // Retrieve point to optical boundary process
+  // Only do this once per run
+  static G4OpBoundaryProcess* boundary = 0;
+  
+  if (!boundary) { //pointer is not defined yet
+    // Get list of processes defined for optical photon
+    // and loop through it to find optical boundary process
+    G4ProcessVector* pv = pdef->GetProcessManager()->GetProcessList();
+    for (G4int i=0; i<pv->size(); i++){
+      if ((*pv)[i]->GetProcessName() == "OpBoundary"){
+	  boundary = (G4OpBoundaryProcess*) (*pv)[i];
+	  break;
+      }      
+    }
+  }
+
+  // Note: fGeomBoundary is the current volume
+  G4StepStatus stat = step->GetPostStepPoint()->GetStepStatus();
+  G4cout << "volume: "<< volume->GetName()<<"\n"<<G4endl;
+  if (stat == fGeomBoundary){
+    //G4cout << " Step in geometry"<< fGeomBoundary << " with status: "<<boundary->GetStatus()<<"\n" << G4endl;
+    if (boundary->GetStatus() == Detection){
+      G4String detector_name = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+      G4cout << "##### Sensitive Volume: " << detector_name <<G4endl;
+    }
+  }
+
+  return;
 }

@@ -24,15 +24,12 @@ public:
 
   G4LogicalVolume* GetEnergyPlane() const { return fEnergyPlane; }
   G4LogicalVolume* GetTrackingPlane() const { return fTrackingPlane; }
-  //G4double Scintillation(G4double energy);
 
 private:
-  G4Material* DefineNeon() const;
   G4Material* DefineXenon() const;
   G4MaterialPropertiesTable* PTFE();
   G4MaterialPropertiesTable* OpticalPlane();
-  G4double Scintillation(G4double energy) const;
-  G4double RefractiveIndex(G4double energy) const;
+
   G4LogicalVolume* fEnergyPlane;
   G4LogicalVolume* fTrackingPlane;
   G4double fpressure;
