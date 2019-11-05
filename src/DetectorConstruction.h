@@ -29,6 +29,7 @@ private:
   G4Material* DefineXenon() const;
   G4MaterialPropertiesTable* PTFE();
   G4MaterialPropertiesTable* OpticalPlane();
+  G4MaterialPropertiesTable* TransparentMaterialsTable();
 
   G4LogicalVolume* fEnergyPlane;
   G4LogicalVolume* fTrackingPlane;

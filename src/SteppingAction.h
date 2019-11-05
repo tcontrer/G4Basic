@@ -17,6 +17,7 @@
 
 #include <G4UserSteppingAction.hh>
 #include <G4LogicalVolume.hh>
+#include <G4OpBoundaryProcess.hh>
 
 class SteppingAction: public G4UserSteppingAction
 {
@@ -30,6 +31,7 @@ class SteppingAction: public G4UserSteppingAction
     RunAction* fRunAction;
     G4LogicalVolume* fEnergyPlane;
     G4LogicalVolume* fTrackingPlane;
+    G4OpBoundaryProcess* fboundary;
     TFile* fMyFile;
     TH1F* fhedep;
 };
