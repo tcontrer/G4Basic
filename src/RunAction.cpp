@@ -44,9 +44,9 @@ void RunAction::EndOfRunAction(const G4Run*){
 
   int numevents = fEdepMap.size();
   int numtracks = fxfinMap[0].size();
-  
+
   float edep, xinit, yinit, zinit, xfin, yfin, zfin, dpos;
-  int pid, trackid, eventid;
+  int pid, trackid, eventid, nopt;
 
   // Make output file and branches
   TFile* MyFile = new TFile("MyFile.root", "RECREATE");
@@ -56,6 +56,7 @@ void RunAction::EndOfRunAction(const G4Run*){
   tree1->Branch("nxinit", &xinit, "xinit/F");
   tree1->Branch("nyinit", &yinit, "yinit/F");
   tree1->Branch("nzinit", &zinit, "zinit/F");
+  tree1->Branch("noptical", &nopt, "nopt/I");
   tree2->Branch("nxfin", &xfin, "xfin/F");
   tree2->Branch("nyfin", &yfin, "yfin/F");
   tree2->Branch("nzfin", &zfin, "zfin/F");
@@ -73,6 +74,7 @@ void RunAction::EndOfRunAction(const G4Run*){
     yinit = fyinitMap[i]/cm;
     zinit = fzinitMap[i]/cm;
     eventid = feventids[i];
+    nopt = foptMap[i];
 
     numtracks = fxfinMap[i].size();
     //G4cout <<"Size: "<<size << G4endl;
@@ -107,7 +109,7 @@ void RunAction::AddEdep(G4double edep){
 void RunAction::FillInitials(G4double x, G4double y, G4double z, int eventid){
 
   //G4cout << "EventNum for getting events: "<<feventnum<<"\n" <<G4endl;
-  
+
   fxinitMap[feventnum] = x;
   fyinitMap[feventnum] = y;
   fzinitMap[feventnum] = z;
@@ -117,11 +119,16 @@ void RunAction::FillInitials(G4double x, G4double y, G4double z, int eventid){
 }
 
 void RunAction::FillFinals(G4double x, G4double y, G4double z, G4int pid, G4int trackid){
-  
+
   fxfinMap[feventnum][trackid] = x;
   fyfinMap[feventnum][trackid] = y;
   fzfinMap[feventnum][trackid] = z;
   fpidMap[feventnum][trackid] = pid;
   ftrackMap[feventnum][trackid] = trackid;
   //G4cout << "\nFilling Final Maps:" << fxfinMap[feventnum][trackid] <<" "<<trackid<<"\n"<< G4endl;
+}
+
+void RunAction::DetectedOptical(){
+
+  foptMap[feventnum] += 1;
 }

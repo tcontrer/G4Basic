@@ -23,9 +23,10 @@ public:
   void AddEdep (G4double edep);
   void FillInitials (G4double x, G4double y, G4double z, G4int eventid);
   void FillFinals (G4double x, G4double y, G4double z, G4int pid, G4int trackid);
+  void DetectedOptical ();
   void NextEvent () {feventnum++;}
   int EventNum () {return feventnum;}
-  
+
  private:
   G4Accumulable<G4double> fEdep;
   int feventnum;
@@ -34,6 +35,7 @@ public:
   std::map<int,float> fyinitMap;
   std::map<int,float> fzinitMap;
   std::map<int, int> feventids;
+  std::map<int, int> foptMap;
   std::map<int,std::map<int,float>> fxfinMap;
   std::map<int,std::map<int,float>> fyfinMap;
   std::map<int,std::map<int,float>> fzfinMap;

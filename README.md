@@ -1,4 +1,3 @@
-# G4Basic
+# G4Basic: Teflon study
 
 # To Run (from build directory):
-#TESTING FOR TEFLON
