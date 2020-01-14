@@ -62,7 +62,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // FIXME: sizes and distances???
   G4String teflon_name = "TEFLON";
   G4double teflon_len = 10.*cm;
-  G4double teflon_width = 100.*mm; // This will vary
+  G4double teflon_width = 1.5*mm; // 0.5, 1.0, 1.5 mm
   G4double teflon_xpos = 10.*cm;
   G4ThreeVector teflon_pos = G4ThreeVector(0., 0., teflon_xpos);
   G4Material* teflon_mat =
@@ -92,8 +92,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // FIXME: sizes and distances???
   G4String tracking_name = "TRACKING_PLANE";
   G4double tracking_len = 10.*cm;
-  G4double tracking_width = 1.*mm; // This will vary
-  G4double tracking_xpos = teflon_xpos*2.;
+  G4double tracking_width = 1.*mm;
+  G4double tracking_xpos = teflon_xpos+teflon_width/2.+tracking_width/2.;
   G4ThreeVector tracking_pos = G4ThreeVector(0., 0., tracking_xpos);
   G4Material* tracking_mat =
     G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
@@ -113,8 +113,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     tracking_plane);
   tracking_plane->SetMaterialPropertiesTable(OpticalPlane());
 
-  //new G4PVPlacement(0, tracking_pos,
-  //		    tracking_logic_vol, tracking_name, world_logic_vol, false, 0, true);
+  new G4PVPlacement(0, tracking_pos,
+  		    tracking_logic_vol, tracking_name, world_logic_vol, false, 0, true);
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ G4MaterialPropertiesTable* DetectorConstruction::OpticalPlane(){
   // define props for a given number of energies
   const G4int NUMENTRIES = 2;
   G4double ENERGIES[NUMENTRIES] = {1.0*eV, 30.*eV};
-  G4double EFFICIENCY[NUMENTRIES] = {1.0, 1.0}; // 0?
+  G4double EFFICIENCY[NUMENTRIES] = {1.0, 1.0};
   G4double RINDEX[NUMENTRIES] = {1.0, 1.0};
   G4double REFLECTIVITY[NUMENTRIES] = {0, 0};
 
