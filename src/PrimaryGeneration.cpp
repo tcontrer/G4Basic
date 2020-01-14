@@ -15,6 +15,7 @@
 #include <G4PrimaryVertex.hh>
 #include <G4Event.hh>
 #include <Randomize.hh>
+#include <G4OpticalPhoton.hh>
 
 PrimaryGeneration::PrimaryGeneration(RunAction* runAction):
   G4VUserPrimaryGeneratorAction(),
@@ -38,10 +39,8 @@ PrimaryGeneration::~PrimaryGeneration()
 
 void PrimaryGeneration::GeneratePrimaries(G4Event* event)
 {
-  // Generate random position within a cylinder
-
-  // Generate random position within a cylinder
-  G4double det_r = 4.*cm; // radius of Xenon chamber
+  // Generate random photon in circular plane, towards teflon
+  G4double det_r = 4.*cm; // radius of beam
   G4double rand = G4UniformRand(); // random number between 0 and 1
   G4double rand_phi = G4UniformRand()*2.*CLHEP::pi;
   G4double rand_r = det_r*std::sqrt(rand);
@@ -53,12 +52,12 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   /////////////////////////////////////////////////////////////////////////////
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
-  G4ParticleDefinition* particle = particleTable->FindParticle(22);
+  G4ParticleDefinition* particle = G4OpticalPhoton::OpticalPhotonDefinition();
   fParticleGun->SetParticleDefinition(particle);
 
   fParticleGun->SetParticlePosition(G4ThreeVector(rand_x, rand_y, 0.));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,1));
-  fParticleGun->SetParticleEnergy(41.6*keV);
+  fParticleGun->SetParticleEnergy(2.8*eV); //450nm
   fParticleGun->GeneratePrimaryVertex(event);
 
   G4int eventid = event->GetEventID();

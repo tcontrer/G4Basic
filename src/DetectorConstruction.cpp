@@ -22,7 +22,6 @@
 
 DetectorConstruction::DetectorConstruction()
   : G4VUserDetectorConstruction(),
-    fEnergyPlane(0),
     fTrackingPlane(0),
     fpressure(15.*bar)
 {
@@ -42,7 +41,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   G4String world_name = "WORLD";
   G4double world_size = 10.*m;
-  G4Material* world_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
+  G4Material* world_mat =
+    G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
   world_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
 
   G4Box* world_solid_vol =
@@ -62,8 +62,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // FIXME: sizes and distances???
   G4String teflon_name = "TEFLON";
   G4double teflon_len = 10.*cm;
-  G4double teflon_width = 1.*mm; // This will vary
-  G4double teflon_xpos = 5.*cm;
+  G4double teflon_width = 100.*mm; // This will vary
+  G4double teflon_xpos = 10.*cm;
   G4ThreeVector teflon_pos = G4ThreeVector(0., 0., teflon_xpos);
   G4Material* teflon_mat =
     G4NistManager::Instance()->FindOrBuildMaterial("G4_TEFLON");
@@ -74,7 +74,14 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     new G4LogicalVolume(teflon_solid_vol, teflon_mat, teflon_name);
 
   // FIXME
-    teflon_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
+  teflon_mat->SetMaterialPropertiesTable(TeflonMaterialsTable());
+
+  // Optical Properties of teflon surface (giving it a photon detection efficiency)
+  //G4OpticalSurface* teflon_plane = new G4OpticalSurface("TEFLON_SURFACE");
+
+  //new G4LogicalSkinSurface("TEFLON_PLANE", teflon_logic_vol,
+  //  teflon_plane);
+  //teflon_plane->SetMaterialPropertiesTable(TeflonSurface());
 
   new G4PVPlacement(0, teflon_pos,
     teflon_logic_vol, teflon_name, world_logic_vol, false, 0, true);
@@ -83,7 +90,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // TRACKING PLANE
   /////////////////////////////////////////////////////////////////////////////
   // FIXME: sizes and distances???
-  G4String tracking_name = "TEFLON";
+  G4String tracking_name = "TRACKING_PLANE";
   G4double tracking_len = 10.*cm;
   G4double tracking_width = 1.*mm; // This will vary
   G4double tracking_xpos = teflon_xpos*2.;
@@ -92,54 +99,22 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
 
   G4Box* tracking_solid_vol =
-    new G4Box(tracking_name, tracking_len/2., tracking_len/2., tracking_width/2.);
+    new G4Box(tracking_name, tracking_len/2.,
+      tracking_len/2., tracking_width/2.);
   G4LogicalVolume* tracking_logic_vol =
     new G4LogicalVolume(tracking_solid_vol, tracking_mat, tracking_name);
-
-  new G4PVPlacement(0, tracking_pos,
-    tracking_logic_vol, tracking_name, world_logic_vol, false, 0, true);
 
   tracking_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
 
   // Optical Properties of plane (giving it a photon detection efficiency)
   G4OpticalSurface* tracking_plane = new G4OpticalSurface("TRACKING_SURFACE");
 
-  new G4LogicalSkinSurface("TRACKING_PLANE", tracking_logic_vol, tracking_plane);
+  new G4LogicalSkinSurface("TRACKING_PLANE", tracking_logic_vol,
+    tracking_plane);
   tracking_plane->SetMaterialPropertiesTable(OpticalPlane());
 
-  new G4PVPlacement(0, tracking_pos,
-  		    tracking_logic_vol, tracking_name, world_logic_vol, false, 0, true);
-
-
-
-  /*
-  /////////////////////////////////////////////////////////////////////////////
-  // REFLECTIVE BARREL
-  /////////////////////////////////////////////////////////////////////////////
-
-  G4String barrel_name = "BARREL";
-  G4double barrel_inner_diam = xenon_diam;
-  G4double barrel_thickness = 5.0*cm;
-  G4double barrel_length = xenon_length;
-  G4Material* barrel_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_POLYETHYLENE");
-  barrel_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
-
-  // Optical Surface Properties (making the barrel reflective)
-  G4OpticalSurface* refl_surface = new G4OpticalSurface("REFL_SURFACE");
-  refl_surface->SetType(dielectric_metal);
-  refl_surface->SetMaterialPropertiesTable(PTFE());
-
-  G4Tubs* barrel_solid_vol =
-    new G4Tubs(barrel_name, barrel_inner_diam/2, barrel_inner_diam/2.+barrel_thickness,
-		barrel_length/2., 0, 360.*deg);
-
-  G4LogicalVolume* barrel_logic_vol =
-    new G4LogicalVolume(barrel_solid_vol, barrel_mat, barrel_name);
-  new G4LogicalSkinSurface("REFL_BARREL", barrel_logic_vol, refl_surface);
-
-  new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),
-		    barrel_logic_vol, barrel_name, world_logic_vol, false, 0, true);
- */
+  //new G4PVPlacement(0, tracking_pos,
+  //		    tracking_logic_vol, tracking_name, world_logic_vol, false, 0, true);
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -150,6 +125,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4VisAttributes* Grey = new G4VisAttributes(G4Colour(.5, .5, .5, .4));
   G4VisAttributes* Yellow = new G4VisAttributes(G4Colour(1.0, 1.0, 0, .1));
   tracking_logic_vol->SetVisAttributes(Yellow);
+  teflon_logic_vol->SetVisAttributes(Grey);
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -177,6 +153,45 @@ G4MaterialPropertiesTable* DetectorConstruction::OpticalPlane(){
   plane_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, NUMENTRIES);
 
   return plane_mpt;
+}
+
+G4MaterialPropertiesTable* DetectorConstruction::TeflonSurface(){
+  // Defines the optical properties for the detector planes
+
+  G4MaterialPropertiesTable* plane_mpt = new G4MaterialPropertiesTable();
+
+  // define props for a given number of energies
+  const G4int NUMENTRIES = 2;
+  G4double ENERGIES[NUMENTRIES] = {1.0*eV, 30.*eV};
+  //G4double EFFICIENCY[NUMENTRIES] = {1.0, 1.0}; // 0?
+  G4double RINDEX[NUMENTRIES] = {1.38, 1.38};
+  G4double REFLECTIVITY[NUMENTRIES] = {.9, .9};
+
+  //plane_mpt->AddProperty("EFFICIENCY", ENERGIES, EFFICIENCY, NUMENTRIES);
+  plane_mpt->AddProperty("RINDEX", ENERGIES, RINDEX, NUMENTRIES);
+  plane_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, NUMENTRIES);
+
+  return plane_mpt;
+}
+
+G4MaterialPropertiesTable* DetectorConstruction::TeflonMaterialsTable(){
+  // Defines the optical properties for the detector planes
+
+  G4MaterialPropertiesTable* teflon_mpt = new G4MaterialPropertiesTable();
+
+  // define props for a given number of energies
+  const G4int NUMENTRIES = 2;
+  G4double ENERGIES[NUMENTRIES] = {1.0*eV, 30.*eV};
+
+  G4double RINDEX[NUMENTRIES] = {1.38, 1.38};
+  G4double REFLECTIVITY[NUMENTRIES] = {.9, .9};
+  G4double TRANSMITTANCE[NUMENTRIES] = {.1, .1};
+
+  teflon_mpt->AddProperty("RINDEX", ENERGIES, RINDEX, NUMENTRIES);
+  teflon_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, NUMENTRIES);
+  teflon_mpt->AddProperty("TRANSMITTANCE", ENERGIES, TRANSMITTANCE, NUMENTRIES);
+
+  return teflon_mpt;
 }
 
 G4MaterialPropertiesTable* DetectorConstruction::TransparentMaterialsTable(){

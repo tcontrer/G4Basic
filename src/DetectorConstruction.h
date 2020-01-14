@@ -22,16 +22,14 @@ public:
   virtual ~DetectorConstruction();
   virtual G4VPhysicalVolume* Construct();
 
-  G4LogicalVolume* GetEnergyPlane() const { return fEnergyPlane; }
   G4LogicalVolume* GetTrackingPlane() const { return fTrackingPlane; }
 
 private:
-  G4Material* DefineXenon() const;
-  G4MaterialPropertiesTable* PTFE();
   G4MaterialPropertiesTable* OpticalPlane();
+  G4MaterialPropertiesTable* TeflonSurface();
+  G4MaterialPropertiesTable* TeflonMaterialsTable();
   G4MaterialPropertiesTable* TransparentMaterialsTable();
 
-  G4LogicalVolume* fEnergyPlane;
   G4LogicalVolume* fTrackingPlane;
   G4double fpressure;
 };
