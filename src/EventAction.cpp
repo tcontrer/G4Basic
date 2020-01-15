@@ -23,7 +23,7 @@ EventAction::~EventAction()
 
 void EventAction::BeginOfEventAction(const G4Event*)
 {
-  G4cout << "%%%%%%%%%%%%%%%%%%%%%%%% BEGIN EVENT "<<fRunAction->EventNum()+1<<"  %%%%%%%%%%%%%%%%%%%%%%%%\n"<<G4endl;
+  //G4cout << "%%%%%%%%%%%%%%%%%%%%%%%% BEGIN EVENT "<<fRunAction->EventNum()+1<<"  %%%%%%%%%%%%%%%%%%%%%%%%\n"<<G4endl;
   fEdep = 0.;
   //fNumPhotons = 0;
   fTrackMap.clear();

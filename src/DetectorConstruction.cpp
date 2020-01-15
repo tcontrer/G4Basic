@@ -73,15 +73,15 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4LogicalVolume* teflon_logic_vol =
     new G4LogicalVolume(teflon_solid_vol, teflon_mat, teflon_name);
 
-  // FIXME
   teflon_mat->SetMaterialPropertiesTable(TeflonMaterialsTable());
 
-  // Optical Properties of teflon surface (giving it a photon detection efficiency)
-  //G4OpticalSurface* teflon_plane = new G4OpticalSurface("TEFLON_SURFACE");
+  // Optical Properties of teflon surface
+  // (need this to define reflectivity/transmittance different than rindex)
+  G4OpticalSurface* teflon_plane = new G4OpticalSurface("TEFLON_SURFACE");
 
-  //new G4LogicalSkinSurface("TEFLON_PLANE", teflon_logic_vol,
-  //  teflon_plane);
-  //teflon_plane->SetMaterialPropertiesTable(TeflonSurface());
+  new G4LogicalSkinSurface("TEFLON_PLANE", teflon_logic_vol,
+    teflon_plane);
+  teflon_plane->SetMaterialPropertiesTable(TeflonSurface());
 
   new G4PVPlacement(0, teflon_pos,
     teflon_logic_vol, teflon_name, world_logic_vol, false, 0, true);
@@ -166,10 +166,12 @@ G4MaterialPropertiesTable* DetectorConstruction::TeflonSurface(){
   //G4double EFFICIENCY[NUMENTRIES] = {1.0, 1.0}; // 0?
   G4double RINDEX[NUMENTRIES] = {1.38, 1.38};
   G4double REFLECTIVITY[NUMENTRIES] = {.9, .9};
+  G4double TRANSMITTANCE[NUMENTRIES] = {.1, .1};
 
   //plane_mpt->AddProperty("EFFICIENCY", ENERGIES, EFFICIENCY, NUMENTRIES);
   plane_mpt->AddProperty("RINDEX", ENERGIES, RINDEX, NUMENTRIES);
   plane_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, NUMENTRIES);
+  plane_mpt->AddProperty("TRANSMITTANCE", ENERGIES, TRANSMITTANCE, NUMENTRIES);
 
   return plane_mpt;
 }
@@ -186,10 +188,12 @@ G4MaterialPropertiesTable* DetectorConstruction::TeflonMaterialsTable(){
   G4double RINDEX[NUMENTRIES] = {1.38, 1.38};
   G4double REFLECTIVITY[NUMENTRIES] = {.9, .9};
   G4double TRANSMITTANCE[NUMENTRIES] = {.1, .1};
+  G4double ABSLENGTH[NUMENTRIES] = {1.*cm, 2.*cm};
 
   teflon_mpt->AddProperty("RINDEX", ENERGIES, RINDEX, NUMENTRIES);
   teflon_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, NUMENTRIES);
   teflon_mpt->AddProperty("TRANSMITTANCE", ENERGIES, TRANSMITTANCE, NUMENTRIES);
+  teflon_mpt->AddProperty("ABSLENGTH", ENERGIES, ABSLENGTH, NUMENTRIES);
 
   return teflon_mpt;
 }
@@ -200,6 +204,7 @@ G4MaterialPropertiesTable* DetectorConstruction::TransparentMaterialsTable(){
   const G4int NUMENTRIES = 2;
   G4double ENERGIES[NUMENTRIES] = {7.0*eV, 7.07*eV};
   G4double RIND[NUMENTRIES] = {1.0, 1.0};
+
   G4MaterialPropertiesTable* mpt = new G4MaterialPropertiesTable();
   mpt->AddProperty("RINDEX", ENERGIES, RIND, NUMENTRIES);
 

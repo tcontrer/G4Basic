@@ -98,9 +98,12 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   if (stat == fGeomBoundary){
     //G4cout << "status: "<<fboundary->GetStatus()<<"\n" << G4endl;
     if (fboundary->GetStatus() == Detection){
-      G4String detector_name = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+      G4String detector_name =
+        step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+      //G4String detector_namepost =
+      //  step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
       fRunAction->DetectedOptical();
-      G4cout << "##### Sensitive Volume: " << detector_name <<G4endl;
+      //G4cout << "##### Sensitive Volume: " << detector_name <<", "<<detector_namepost<<G4endl;
     }
   }
 
