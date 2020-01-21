@@ -24,6 +24,7 @@ public:
   void FillInitials (G4double x, G4double y, G4double z, G4int eventid);
   void FillFinals (G4double x, G4double y, G4double z, G4int pid, G4int trackid);
   void DetectedOptical ();
+  void FillOpProcessID (G4int opProcessID);
   void NextEvent () {feventnum++;}
   int EventNum () {return feventnum;}
 
@@ -36,6 +37,7 @@ public:
   std::map<int,float> fzinitMap;
   std::map<int, int> feventids;
   std::map<int, int> foptMap;
+  std::map<int, int> fopProcessIDs;
   std::map<int,std::map<int,float>> fxfinMap;
   std::map<int,std::map<int,float>> fyfinMap;
   std::map<int,std::map<int,float>> fzfinMap;

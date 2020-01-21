@@ -32,7 +32,6 @@ SteppingAction::~SteppingAction()
 {
 }
 
-
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
   G4Track* track = step->GetTrack();
@@ -47,6 +46,42 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4LogicalVolume* volume
     = step->GetPreStepPoint()->GetTouchableHandle()
     ->GetVolume()->GetLogicalVolume();
+
+  /*////////////////////////////////////////////// Testing stepping actions
+  G4ParticleDefinition* pdef = step->GetTrack()->GetDefinition();
+  G4TrackStatus trackstatus = track->GetTrackStatus();
+  if (!fboundary) { //pointer is not defined yet
+    // Get list of processes defined for optical photon
+    // and loop through it to find optical boundary process
+    G4ProcessVector* pv = pdef->GetProcessManager()->GetProcessList();
+    for (G4int i=0; i<pv->size(); i++){
+      if ((*pv)[i]->GetProcessName() == "OpBoundary"){
+    fboundary = (G4OpBoundaryProcess*) (*pv)[i];
+    break;
+      }
+    }
+  }
+  G4String detector_name =
+    step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+
+  if (trackstatus == fAlive){
+    G4String detector_namepost =
+      step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+    G4cout << "boundary status: "<<fboundary->GetStatus()<<" Boundaries: "<<detector_name<<", "<<detector_namepost<<"\n" << G4endl;
+  }
+  G4StepStatus poststepstatus = step->GetPostStepPoint()->GetStepStatus();
+  if (poststepstatus == fGeomBoundary){
+    if (fboundary->GetStatus() == Detection){
+      G4String detector_namepost =
+        step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+      G4cout << "#################### Sensitive Volume: " << detector_name <<", "<<detector_namepost<<G4endl;
+    }
+  }
+  if (trackstatus != fAlive){
+    G4cout << "dead boundary status/track status: "<<fboundary->GetStatus()<<"/"<<step->GetPostStepPoint()->GetStepStatus()<<" End Boundaries: "<<detector_name<<"\n"<<G4endl;
+  }
+*/
+/////////////////////////////////////////////////////////////////////// End test
 
   G4double edepStep = step->GetTotalEnergyDeposit();
   fEventAction->AddEdep(edepStep);
@@ -96,14 +131,18 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4StepStatus stat = step->GetPostStepPoint()->GetStepStatus();
   //G4cout << "volume: "<< volume->GetName()<<"\n"<<G4endl;
   if (stat == fGeomBoundary){
-    //G4cout << "status: "<<fboundary->GetStatus()<<"\n" << G4endl;
+    G4String detector_name =
+      step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+    G4String detector_namepost =
+      step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+    //G4cout << "status: "<<fboundary->GetStatus()<<" Boundaries: "<<detector_name<<", "<<detector_namepost<<"\n" << G4endl;
     if (fboundary->GetStatus() == Detection){
-      G4String detector_name =
-        step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
+      //G4String detector_name =
+      //  step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
       //G4String detector_namepost =
       //  step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
       fRunAction->DetectedOptical();
-      //G4cout << "##### Sensitive Volume: " << detector_name <<", "<<detector_namepost<<G4endl;
+      //G4cout << "#################### Sensitive Volume: " << detector_name <<", "<<detector_namepost<<G4endl;
     }
   }
 

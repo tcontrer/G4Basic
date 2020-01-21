@@ -46,7 +46,7 @@ void RunAction::EndOfRunAction(const G4Run*){
   int numtracks = fxfinMap[0].size();
 
   float edep, xinit, yinit, zinit, xfin, yfin, zfin, dpos;
-  int pid, trackid, eventid, nopt;
+  int pid, trackid, eventid, nopt, opProcessID;
 
   // Make output file and branches
   TFile* MyFile = new TFile("MyFile.root", "RECREATE");
@@ -75,6 +75,7 @@ void RunAction::EndOfRunAction(const G4Run*){
     zinit = fzinitMap[i]/cm;
     eventid = feventids[i];
     nopt = foptMap[i];
+    opProcessID = fopProcessIDs[i];
 
     numtracks = fxfinMap[i].size();
     //G4cout <<"Size: "<<size << G4endl;
@@ -131,4 +132,9 @@ void RunAction::FillFinals(G4double x, G4double y, G4double z, G4int pid, G4int 
 void RunAction::DetectedOptical(){
 
   foptMap[feventnum] += 1;
+}
+
+void RunAction::FillOpProcessID(G4int opProcessID){
+  fopProcessIDs[feventnum] = opProcessID;
+
 }
