@@ -32,7 +32,7 @@ int main(int argc, char** argv)
   if ( argc == 1 ) {
     ui = new G4UIExecutive(argc, argv);
   }
-  
+
   // Construct the run manager and set the initialization classes
   G4RunManager* runmgr = new G4RunManager();
 

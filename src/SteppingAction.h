@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-//  G4Basic | SteppingAction.H
+//  G4Basic | SteppingAction.h
 //
 //
 //   * Author: Taylor Contreras, Justo Martin-Albo

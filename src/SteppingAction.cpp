@@ -47,9 +47,55 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     = step->GetPreStepPoint()->GetTouchableHandle()
     ->GetVolume()->GetLogicalVolume();
 
-  /*////////////////////////////////////////////// Testing stepping actions
-  G4ParticleDefinition* pdef = step->GetTrack()->GetDefinition();
-  G4TrackStatus trackstatus = track->GetTrackStatus();
+  ////////////////////////////////////////////// Testing stepping actions
+  //G4ParticleDefinition* pdef = step->GetTrack()->GetDefinition();
+  //G4TrackStatus trackstatus = track->GetTrackStatus();
+  /*
+  // Testing what OpBoundary is doing
+  const G4DynamicParticle* aParticle = track->GetDynamicParticle();
+  G4double thePhotonMomentum = aParticle->GetTotalMomentum();
+  G4LogicalSurface* Surface = NULL;
+  G4OpticalSurface* OpticalSurface = NULL;
+  Surface = G4LogicalBorderSurface::GetSurface
+     (step->GetPreStepPoint()->GetPhysicalVolume(),
+     step->GetPostStepPoint()->GetPhysicalVolume());
+
+  if (Surface == NULL){
+     G4bool enteredDaughter=(step->GetPostStepPoint()->GetPhysicalVolume()
+                             ->GetMotherLogical() ==
+                             step->GetPreStepPoint()->GetPhysicalVolume()
+                             ->GetLogicalVolume());
+      if (enteredDaughter) {
+         Surface = G4LogicalSkinSurface::GetSurface
+               (step->GetPostStepPoint()->GetPhysicalVolume()->
+                GetLogicalVolume());
+          if(Surface == NULL)
+               Surface = G4LogicalSkinSurface::GetSurface
+               (step->GetPreStepPoint()->GetPhysicalVolume()->
+                GetLogicalVolume());
+      }
+      else {
+          Surface = G4LogicalSkinSurface::GetSurface
+               (step->GetPreStepPoint()->GetPhysicalVolume()->
+                GetLogicalVolume());
+          if(Surface == NULL)
+               Surface = G4LogicalSkinSurface::GetSurface
+               (step->GetPostStepPoint()->GetPhysicalVolume()->
+                GetLogicalVolume());
+      }
+  }
+  if (Surface) {
+      OpticalSurface =
+        dynamic_cast <G4OpticalSurface*> (Surface->GetSurfaceProperty());
+      G4MaterialPropertiesTable* aMaterialPropertiesTable =
+        OpticalSurface->GetMaterialPropertiesTable();
+      G4MaterialPropertyVector* PropertyPointer =
+        aMaterialPropertiesTable->GetProperty("REFLECTIVITY");
+      G4double theReflectivity = PropertyPointer->Value(thePhotonMomentum);
+
+      G4cout << "Testing G4OpBoundaryProcess: R="<<theReflectivity<<"\n"<<G4endl;
+  }
+
   if (!fboundary) { //pointer is not defined yet
     // Get list of processes defined for optical photon
     // and loop through it to find optical boundary process
@@ -61,13 +107,16 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       }
     }
   }
+
   G4String detector_name =
     step->GetPreStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
 
   if (trackstatus == fAlive){
     G4String detector_namepost =
       step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
-    G4cout << "boundary status: "<<fboundary->GetStatus()<<" Boundaries: "<<detector_name<<", "<<detector_namepost<<"\n" << G4endl;
+    //if (fboundary->GetStatus()==3){
+      G4cout << "boundary status: "<<fboundary->GetStatus()<<" Boundaries: "<<detector_name<<", "<<detector_namepost<<"\n" << G4endl;
+    //}
   }
   G4StepStatus poststepstatus = step->GetPostStepPoint()->GetStepStatus();
   if (poststepstatus == fGeomBoundary){
@@ -78,16 +127,17 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     }
   }
   if (trackstatus != fAlive){
-    G4cout << "dead boundary status/track status: "<<fboundary->GetStatus()<<"/"<<step->GetPostStepPoint()->GetStepStatus()<<" End Boundaries: "<<detector_name<<"\n"<<G4endl;
+    G4cout << "dead boundary status/track status: "<<fboundary->GetStatus()<<"/"<<step->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName()<<" End Boundaries: "<<detector_name<<"\n"<<G4endl;
   }
-*/
-/////////////////////////////////////////////////////////////////////// End test
+
+*//////////////////////////////////////////////////////////////////////// End test
 
   G4double edepStep = step->GetTotalEnergyDeposit();
   fEventAction->AddEdep(edepStep);
 
   std::map<int, int> TrackMap = fEventAction->GetTrackMap();
   G4TrackStatus status = track->GetTrackStatus();
+
   if (status != fAlive){
     //G4cout << "Trackid: "<<trackid<<" pid: "<<track->GetParticleDefinition()->GetPDGEncoding()<<"\n"<<G4endl;
 

@@ -16,6 +16,7 @@
 #include <G4Event.hh>
 #include <Randomize.hh>
 #include <G4OpticalPhoton.hh>
+#include <G4GenericMessenger.hh>
 
 PrimaryGeneration::PrimaryGeneration(RunAction* runAction):
   G4VUserPrimaryGeneratorAction(),
@@ -46,6 +47,10 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   G4double rand_r = det_r*std::sqrt(rand);
   G4double rand_x = rand_r*cos(rand_phi);
   G4double rand_y = rand_r*sin(rand_phi);
+  G4double z = 0*cm;
+  G4double pz = 1;
+  G4double py = 0;
+  G4double px = 0;
 
   /////////////////////////////////////////////////////////////////////////////
   // Testing with single photon
@@ -55,11 +60,11 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
   G4ParticleDefinition* particle = G4OpticalPhoton::OpticalPhotonDefinition();
   fParticleGun->SetParticleDefinition(particle);
 
-  fParticleGun->SetParticlePosition(G4ThreeVector(rand_x, rand_y, 0.));
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0,0,1));
+  fParticleGun->SetParticlePosition(G4ThreeVector(rand_x, rand_y, z));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(px,py,pz));
   fParticleGun->SetParticleEnergy(2.8*eV); //450nm
   fParticleGun->GeneratePrimaryVertex(event);
 
   G4int eventid = event->GetEventID();
-  fRunAction->FillInitials(rand_x, rand_y, 0, eventid);
+  fRunAction->FillInitials(rand_x, rand_y, z, eventid);
 }
