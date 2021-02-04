@@ -17,7 +17,6 @@
 #include <G4UIExecutive.hh>
 #include <FTFP_BERT_HP.hh>
 #include <G4EmStandardPhysics_option4.hh>
-#include <G4OpticalPhysics.hh>
 #include <G4RadioactiveDecayPhysics.hh>
 
 #include "TFile.h"
@@ -32,13 +31,13 @@ int main(int argc, char** argv)
   if ( argc == 1 ) {
     ui = new G4UIExecutive(argc, argv);
   }
-  
+
   // Construct the run manager and set the initialization classes
   G4RunManager* runmgr = new G4RunManager();
 
   // Set the physics used for this simulation
   G4VModularPhysicsList* physics_list = new G4VModularPhysicsList();
-  physics_list->RegisterPhysics(new G4OpticalPhysics());
+  //physics_list->RegisterPhysics(new G4OpticalPhysics());
   physics_list->RegisterPhysics(new G4EmStandardPhysics_option4());
   physics_list->RegisterPhysics(new G4RadioactiveDecayPhysics());
   runmgr->SetUserInitialization(physics_list);
