@@ -22,8 +22,6 @@
 
 DetectorConstruction::DetectorConstruction()
   : G4VUserDetectorConstruction(),
-    fEnergyPlane(0),
-    fTrackingPlane(0),
     fpressure(15.*bar)
 {
 }
@@ -41,7 +39,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   /////////////////////////////////////////////////////////////////////////////
 
   G4String world_name = "WORLD";
-  G4double world_size = 10.*m;
+  G4double world_size = 15.*m;
   G4Material* world_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
   world_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
 
@@ -57,58 +55,33 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
                       world_logic_vol, world_name, 0, false, 0, true);
 
   /////////////////////////////////////////////////////////////////////////////
-  // XENON CHAMBER
+  // ARGON CHAMBER
   /////////////////////////////////////////////////////////////////////////////
 
-  G4String xenon_name = "XENON";
-  G4double xenon_diam   = 1.0*m;
-  G4double xenon_length = 1.0*m;
-  G4Material* xenon_mat = DefineXenon();
+  G4String argon_name = "ARGON";
+  G4double argon_vertical   = 2.325*m;
+  G4double argon_horizontal = 2.560*m;
+  G4double argon_logitudinal = 10.368*m;
+  G4Material* argon_mat = DefineArgon();
 
-  G4Tubs* xenon_solid_vol =
-    new G4Tubs(xenon_name, 0., xenon_diam/2., xenon_length/2., 0., 360.*deg);
+  G4Box* argon_solid_vol =
+    new G4Box(argon_name, argon_size/2., argon_size/2., argon_size/2.);
 
-  G4LogicalVolume* xenon_logic_vol =
-    new G4LogicalVolume(xenon_solid_vol, xenon_mat, xenon_name);
+  G4LogicalVolume* argon_logic_vol =
+    new G4LogicalVolume(argon_solid_vol, argon_mat, argon_name);
 
-  G4VPhysicalVolume* xenon_phys = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),
-					       xenon_logic_vol, xenon_name, world_logic_vol, false, 0, true);
+  G4VPhysicalVolume* argon_phys = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),
+					       argon_logic_vol, argon_name, world_logic_vol, false, 0, true);
 
-  /////////////////////////////////////////////////////////////////////////////
-  // REFLECTIVE BARREL
-  /////////////////////////////////////////////////////////////////////////////
-
-  G4String barrel_name = "BARREL";
-  G4double barrel_inner_diam = xenon_diam;
-  G4double barrel_thickness = 5.0*cm;
-  G4double barrel_length = xenon_length;
-  G4Material* barrel_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_POLYETHYLENE");
-  barrel_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
-
-  // Optical Surface Properties (making the barrel reflective)
-  G4OpticalSurface* refl_surface = new G4OpticalSurface("REFL_SURFACE");
-  refl_surface->SetType(dielectric_metal);
-  refl_surface->SetMaterialPropertiesTable(PTFE());
-
-  G4Tubs* barrel_solid_vol =
-    new G4Tubs(barrel_name, barrel_inner_diam/2, barrel_inner_diam/2.+barrel_thickness,
-		barrel_length/2., 0, 360.*deg);
-
-  G4LogicalVolume* barrel_logic_vol =
-    new G4LogicalVolume(barrel_solid_vol, barrel_mat, barrel_name);
-  new G4LogicalSkinSurface("REFL_BARREL", barrel_logic_vol, refl_surface);
-
-  new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),
-		    barrel_logic_vol, barrel_name, world_logic_vol, false, 0, true);
 
   /////////////////////////////////////////////////////////////////////////////
-  // TRACKING PLANE
+  // ENERGY PLANE
   /////////////////////////////////////////////////////////////////////////////
-
+  /*
   G4String tracking_name = "TRACKING_PLANE";
   G4double tracking_diam = barrel_inner_diam + barrel_thickness*2.;
   G4double tracking_length = 12.*cm;
-  G4ThreeVector tracking_pos = G4ThreeVector(0., 0., xenon_length/2. + tracking_length/2.);
+  G4ThreeVector tracking_pos = G4ThreeVector(0., 0., argon_length/2. + tracking_length/2.);
   G4Material* tracking_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
   tracking_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
 
@@ -134,7 +107,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4String energy_name = "ENERGY_PLANE";
   G4double energy_diam = barrel_inner_diam + barrel_thickness*2.;
   G4double energy_length = 12.*cm;
-  G4ThreeVector energy_pos = G4ThreeVector(0., 0., -(xenon_length/2. + tracking_length/2.));
+  G4ThreeVector energy_pos = G4ThreeVector(0., 0., -(argon_length/2. + tracking_length/2.));
   G4Material* energy_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_Cu");
   energy_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
 
@@ -152,7 +125,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
   new G4PVPlacement(0, energy_pos,
                     energy_logic_vol, energy_name, world_logic_vol, false, 0, true);
-
+  */
   /////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////
   // SET VISIBILITY ATTRIBUTES
@@ -160,39 +133,36 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4VisAttributes* Blue = new G4VisAttributes(G4Colour(0,0.5,1.0,0.1));
   G4VisAttributes* Grey = new G4VisAttributes(G4Colour(.5, .5, .5, .4));
   G4VisAttributes* Yellow = new G4VisAttributes(G4Colour(1.0, 1.0, 0, .1));
-  tracking_logic_vol->SetVisAttributes(Yellow);
-  barrel_logic_vol->SetVisAttributes(Grey);
-  xenon_logic_vol->SetVisAttributes(Blue);
-  energy_logic_vol->SetVisAttributes(Yellow);
+  //tracking_logic_vol->SetVisAttributes(Yellow);
+  //barrel_logic_vol->SetVisAttributes(Grey);
+  argon_logic_vol->SetVisAttributes(Blue);
+  //energy_logic_vol->SetVisAttributes(Yellow);
 
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
-
-  fEnergyPlane = energy_logic_vol;
-  fTrackingPlane = tracking_logic_vol;
 
   return world_phys_vol;
 }
 
 
-G4Material* DetectorConstruction::DefineXenon() const{
-  // Defines the material and optical properties of gaseous xenon
+G4Material* DetectorConstruction::DefineArgon() const{
+  // Defines the material and optical properties of gaseous argon
 
-  G4String material_name = "GXe";
-  G4double density = 88.56 * kg/m3;
-  //G4double pressure = 15.0 * bar;
-  G4double temperature = 300. * kelvin;
+  G4String material_name = "GAr";
+  G4double density = 1.394 * g/cm3;
+  //G4double pressure = 1.24 * bar;
+  G4double temperature = 87. * kelvin;
   G4double sc_yield = 20000*1/MeV; // Estimated ~50 photons/eV
 
   G4Material* material = new G4Material(material_name, density, 1,
 			    kStateGas, temperature, fpressure);
-  G4Element* Xe = G4NistManager::Instance()->FindOrBuildElement("Xe");
+  G4Element* Xe = G4NistManager::Instance()->FindOrBuildElement("Ar");
   material->AddElement(Xe,1);
 
-  // Optical Properties of Xenon
-  // From Geant4 Liquid Xenon example
-  // FIXME: what should these number be for this gasous xenon detector???
+  // Optical Properties of argon
+  // From Geant4 Liquid argon example
+  // FIXME: what should these number be for this gasous argon detector???
   const G4int GXe_NUMENTRIES = 3;
   G4double GXe_Energy[GXe_NUMENTRIES]    = { 7.0*eV , 7.07*eV, 7.14*eV };
   G4double GXe_SCINT[GXe_NUMENTRIES] = { 0.1, 1.0, 0.1 };
@@ -214,41 +184,6 @@ G4Material* DetectorConstruction::DefineXenon() const{
   material->SetMaterialPropertiesTable(GXe_mt);
 
   return material;
-}
-
-
-G4MaterialPropertiesTable* DetectorConstruction::PTFE(){
-  // Defines the optical properties for PTFE
-
-  G4MaterialPropertiesTable* teflon_mpt = new G4MaterialPropertiesTable();
-
-  // define props for a given number of energies
-  const G4int REFL_NUMENTRIES = 2;
-  G4double ENERGIES[REFL_NUMENTRIES] = {1.0*eV, 30.*eV};
-  G4double REFLECTIVITY[REFL_NUMENTRIES] = {1.0, 1.0};
-
-  teflon_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, REFL_NUMENTRIES);
-
-  return teflon_mpt;
-}
-
-G4MaterialPropertiesTable* DetectorConstruction::OpticalPlane(){
-  // Defines the optical properties for the detector planes
-
-  G4MaterialPropertiesTable* plane_mpt = new G4MaterialPropertiesTable();
-
-  // define props for a given number of energies
-  const G4int NUMENTRIES = 2;
-  G4double ENERGIES[NUMENTRIES] = {1.0*eV, 30.*eV};
-  G4double EFFICIENCY[NUMENTRIES] = {1.0, 1.0}; // 0?
-  G4double RINDEX[NUMENTRIES] = {1.0, 1.0};
-  G4double REFLECTIVITY[NUMENTRIES] = {0, 0};
-
-  plane_mpt->AddProperty("EFFICIENCY", ENERGIES, EFFICIENCY, NUMENTRIES);
-  plane_mpt->AddProperty("RINDEX", ENERGIES, RINDEX, NUMENTRIES);
-  plane_mpt->AddProperty("REFLECTIVITY", ENERGIES, REFLECTIVITY, NUMENTRIES);
-
-  return plane_mpt;
 }
 
 G4MaterialPropertiesTable* DetectorConstruction::TransparentMaterialsTable(){

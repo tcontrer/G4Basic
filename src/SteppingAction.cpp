@@ -21,8 +21,6 @@
 SteppingAction::SteppingAction(EventAction* eventAction, RunAction* runAction):
   G4UserSteppingAction(),
   fEventAction(eventAction),
-  fEnergyPlane(0),
-  fTrackingPlane(0),
   fRunAction(runAction),
   fboundary(0)
 {
@@ -42,8 +40,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   const DetectorConstruction* detectorConstruction
     = static_cast<const DetectorConstruction*>
     ( G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-  fEnergyPlane = detectorConstruction->GetEnergyPlane();
-  fTrackingPlane = detectorConstruction->GetTrackingPlane();
 
   // Get volume of current step
   G4LogicalVolume* volume
