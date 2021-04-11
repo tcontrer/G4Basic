@@ -65,7 +65,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4Material* argon_mat = DefineArgon();
 
   G4Box* argon_solid_vol =
-    new G4Box(argon_name, argon_size/2., argon_size/2., argon_size/2.);
+    new G4Box(argon_name, argon_horizontal/2., argon_vertical/2., argon_logitudinal/2.);
 
   G4LogicalVolume* argon_logic_vol =
     new G4LogicalVolume(argon_solid_vol, argon_mat, argon_name);
