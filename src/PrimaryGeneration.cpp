@@ -24,9 +24,9 @@ PrimaryGeneration::PrimaryGeneration(RunAction* runAction):
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
 
-  fParticleGun->SetParticleEnergy(0*eV);
+  fParticleGun->SetParticleEnergy(1*GeV);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.));
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,0.));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
 }
 
 
@@ -48,7 +48,8 @@ void PrimaryGeneration::GeneratePrimaries(G4Event* event)
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
-  G4ParticleDefinition* particle = particleTable->FindParticle(nu_e);
+  G4ParticleDefinition* particle = particleTable->FindParticle("mu-");
+  G4cout << "---------- Particle name: " << particle->GetParticleName() << G4endl;
   fParticleGun->SetParticleDefinition(particle);
 
   fParticleGun->SetParticlePosition(G4ThreeVector(0, 0, 0));

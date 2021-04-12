@@ -38,9 +38,9 @@ int main(int argc, char** argv)
 
   // Set the physics used for this simulation
   G4VModularPhysicsList* physics_list = new G4VModularPhysicsList();
-  physics_list->RegisterPhysics(new G4OpticalPhysics());
+  //physics_list->RegisterPhysics(new G4OpticalPhysics());
   physics_list->RegisterPhysics(new G4EmStandardPhysics_option4());
-  physics_list->RegisterPhysics(new G4RadioactiveDecayPhysics());
+  //physics_list->RegisterPhysics(new G4RadioactiveDecayPhysics());
   runmgr->SetUserInitialization(physics_list);
 
   // set up detector geometry

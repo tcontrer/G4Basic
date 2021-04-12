@@ -24,7 +24,6 @@ public:
 
 private:
   G4Material* DefineArgon() const;
-  G4MaterialPropertiesTable* TransparentMaterialsTable();
 
   G4double fpressure;
 };

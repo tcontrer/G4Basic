@@ -41,7 +41,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4String world_name = "WORLD";
   G4double world_size = 15.*m;
   G4Material* world_mat = G4NistManager::Instance()->FindOrBuildMaterial("G4_AIR");
-  world_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
+  //world_mat->SetMaterialPropertiesTable(TransparentMaterialsTable());
 
   G4Box* world_solid_vol =
     new G4Box(world_name, world_size/2., world_size/2., world_size/2.);
@@ -157,9 +157,10 @@ G4Material* DetectorConstruction::DefineArgon() const{
 
   G4Material* material = new G4Material(material_name, density, 1,
 			    kStateGas, temperature, fpressure);
-  G4Element* Xe = G4NistManager::Instance()->FindOrBuildElement("Ar");
-  material->AddElement(Xe,1);
+  G4Element* Ar = G4NistManager::Instance()->FindOrBuildElement("Ar");
+  material->AddElement(Ar,1);
 
+  
   // Optical Properties of argon
   // From Geant4 Liquid argon example
   // FIXME: what should these number be for this gasous argon detector???
@@ -170,7 +171,7 @@ G4Material* DetectorConstruction::DefineArgon() const{
   G4double GXe_ABSL[GXe_NUMENTRIES]  = {1.e8*m, 1.e8*m, 1.e8*m};
 
   G4MaterialPropertiesTable* GXe_mt = new G4MaterialPropertiesTable();
-
+  /*
   GXe_mt->AddProperty("FASTCOMPONENT", GXe_Energy, GXe_SCINT, GXe_NUMENTRIES);
   GXe_mt->AddProperty("RINDEX",        GXe_Energy, GXe_RIND,  GXe_NUMENTRIES);
   GXe_mt->AddProperty("ABSLENGTH",     GXe_Energy, GXe_ABSL,  GXe_NUMENTRIES);
@@ -180,20 +181,8 @@ G4Material* DetectorConstruction::DefineArgon() const{
   GXe_mt->AddConstProperty("YIELDRATIO",1.0);
   GXe_mt->AddProperty("ELSPECTRUM", GXe_Energy, GXe_SCINT, GXe_NUMENTRIES);
   GXe_mt->AddConstProperty("ELTIMECONSTANT", 50.*ns);
-
+  */
   material->SetMaterialPropertiesTable(GXe_mt);
 
   return material;
-}
-
-G4MaterialPropertiesTable* DetectorConstruction::TransparentMaterialsTable(){
-  // Make a material transparent to optical photons
-
-  const G4int NUMENTRIES = 2;
-  G4double ENERGIES[NUMENTRIES] = {7.0*eV, 7.07*eV};
-  G4double RIND[NUMENTRIES] = {1.0, 1.0};
-  G4MaterialPropertiesTable* mpt = new G4MaterialPropertiesTable();
-  mpt->AddProperty("RINDEX", ENERGIES, RIND, NUMENTRIES);
-
-  return mpt;
 }

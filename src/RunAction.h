@@ -22,6 +22,7 @@ public:
 
   void AddEdep (G4double edep);
   void FillInitials (G4double x, G4double y, G4double z, G4int eventid);
+  void FillSteps (G4double x, G4double y, G4double z, G4int trackid);
   void FillFinals (G4double x, G4double y, G4double z, G4int pid, G4int trackid);
   void NextEvent () {feventnum++;}
   int EventNum () {return feventnum;}
@@ -34,6 +35,9 @@ public:
   std::map<int,float> fyinitMap;
   std::map<int,float> fzinitMap;
   std::map<int, int> feventids;
+  std::map<int, std::map<int, std::vector<float>>> fxtrack;
+  std::map<int, std::map<int, std::vector<float>>> fytrack;
+  std::map<int, std::map<int, std::vector<float>>> fztrack;
   std::map<int,std::map<int,float>> fxfinMap;
   std::map<int,std::map<int,float>> fyfinMap;
   std::map<int,std::map<int,float>> fzfinMap;

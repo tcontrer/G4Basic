@@ -45,17 +45,22 @@ void RunAction::EndOfRunAction(const G4Run*){
   int numevents = fEdepMap.size();
   int numtracks = fxfinMap[0].size();
   
-  float edep, xinit, yinit, zinit, xfin, yfin, zfin, dpos;
+  float edep, xinit, yinit, zinit, xtrack, ytrack, ztrack, xfin, yfin, zfin, dpos;
   int pid, trackid, eventid;
 
   // Make output file and branches
   TFile* MyFile = new TFile("MyFile.root", "RECREATE");
   TTree* tree1 = new TTree("tree1", ""); // for single fill per event
   TTree* tree2 = new TTree("tree2", ""); // for multiple fills per event
+  TTree* tree3 = new TTree("tree3", ""); // for multiple fills per track per event
   tree1->Branch("hedep", &edep, "edep/F");
   tree1->Branch("nxinit", &xinit, "xinit/F");
   tree1->Branch("nyinit", &yinit, "yinit/F");
   tree1->Branch("nzinit", &zinit, "zinit/F");
+  tree3->Branch("nxtrack", &xtrack, "xtrack/F");
+  tree3->Branch("nytrack", &ytrack, "ytrack/F");
+  tree3->Branch("nztrack", &ztrack, "ztrack/F");
+  tree3->Branch("ntrackid", &trackid, "trackid/I");
   tree2->Branch("nxfin", &xfin, "xfin/F");
   tree2->Branch("nyfin", &yfin, "yfin/F");
   tree2->Branch("nzfin", &zfin, "zfin/F");
@@ -87,6 +92,15 @@ void RunAction::EndOfRunAction(const G4Run*){
       trackid = ftrackMap[i][j];
 
       dpos = sqrt(pow(xinit - xfin,2.0) + pow(yinit - yfin,2.0) + pow(zinit - zfin,2.0));
+
+      int numsteps = fxtrack[i][j].size();
+      for (int k=1; k<numsteps+1; k++){
+	xtrack = fxtrack[i][j][k];
+	ytrack = fytrack[i][j][k];
+	ztrack = fztrack[i][j][k];
+	tree3->Fill();
+      }
+
       //G4cout << "pid: " << pid <<"\n"<< G4endl;
       tree2->Fill();
     }
@@ -116,6 +130,14 @@ void RunAction::FillInitials(G4double x, G4double y, G4double z, int eventid){
   //G4cout << "\nFilling Initial Maps:" << fxinitMap[feventnum]<<"\n"<<G4endl;
 }
 
+void RunAction::FillSteps(G4double x, G4double y, G4double z,G4int trackid){
+
+  fxtrack[feventnum][trackid].push_back(x);
+  fytrack[feventnum][trackid].push_back(y);
+  fztrack[feventnum][trackid].push_back(z);
+ 
+}
+
 void RunAction::FillFinals(G4double x, G4double y, G4double z, G4int pid, G4int trackid){
   
   fxfinMap[feventnum][trackid] = x;
@@ -123,5 +145,6 @@ void RunAction::FillFinals(G4double x, G4double y, G4double z, G4int pid, G4int 
   fzfinMap[feventnum][trackid] = z;
   fpidMap[feventnum][trackid] = pid;
   ftrackMap[feventnum][trackid] = trackid;
+  
   //G4cout << "\nFilling Final Maps:" << fxfinMap[feventnum][trackid] <<" "<<trackid<<"\n"<< G4endl;
 }
